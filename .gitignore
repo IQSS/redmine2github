@@ -1,3 +1,6 @@
+test_files/*
+src/settings/local.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
