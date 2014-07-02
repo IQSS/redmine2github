@@ -91,8 +91,8 @@ class GithubIssueMaker:
         #  Create the issue on github
         #
         #
-        #issue_obj = self.get_github_conn().issues.create(issue_dict)
-        issue_obj = self.get_github_conn().issues.update(4, issue_dict)
+        issue_obj = self.get_github_conn().issues.create(issue_dict)
+        #issue_obj = self.get_github_conn().issues.update(4, issue_dict)
         
         msgt('issue number: %s' % issue_obj.number)
         msg('issue id: %s' % issue_obj.id)
@@ -112,7 +112,7 @@ class GithubIssueMaker:
             self.add_comments_for_issue(issue_obj.number, journals)
 
 
-        self.label_service.clear_labels(issue_obj.number)
+        #self.label_service.clear_labels(issue_obj.number)
 
         #
         #   Add status!
@@ -220,11 +220,31 @@ if __name__=='__main__':
     #auth = dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)
     #milestone_service = pygithub3.services.issues.Milestones(**auth)
     #comments_service = pygithub3.services.issues.Comments(**auth)
-    
-    fname = '/Users/rmp553/Documents/iqss-git/redmine2github/working_files/redmine_issues/2014-0702/03385.json'
+    #fname = 03385.json'
+    #gm.make_github_issue(fname, {})
+
+    import time
     gm = GithubIssueMaker()
-    gm.make_github_issue(fname, {})
-        
+
+    
+    root_dir = '/Users/rmp553/Documents/iqss-git/redmine2github/working_files/redmine_issues/2014-0702/'
+    
+    cnt =0
+    for fname in os.listdir(root_dir):
+        if fname.endswith('.json'):
+            
+            num = int(fname.replace('.json', ''))
+            if num < 4012: continue
+            msg('Add issue from: %s' % fname)
+            cnt+=1
+            fullname = os.path.join(root_dir, fname)
+            gm.make_github_issue(fullname, {})
+            if cnt == 150:
+                break
+                
+            if cnt%50 == 0:
+                msg('sleep 2 secs')
+                time.sleep(2)
         
         
         
