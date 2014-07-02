@@ -16,6 +16,8 @@ from jinja2 import Environment, PackageLoader
 from utils.msg_util import *
 from github_issues.md_translate import translate_for_github
 from github_issues.github_milestones import GithubMilestoneManager
+from github_issues.github_labels import LabelService
+
 
 from settings.base import get_github_auth   #GITHUB_LOGIN, GITHUB_PASSWORD, GITHUB_TARGET_REPOSITORY, GITHUB_TARGET_USERNAME
 from settings.base import REDMINE_SERVER#, REDMINE_API_KEY, REDMINE_ISSUES_DIRECTORY
@@ -32,6 +34,7 @@ class GithubIssueMaker:
         self.github_conn = None
         self.comments_service = None
         self.milestone_manager = GithubMilestoneManager()
+        self.label_service = LabelService()
         self.jinja_env = Environment(loader=PackageLoader('github_issues', 'templates'))
 
     def get_comments_service(self):
@@ -108,6 +111,61 @@ class GithubIssueMaker:
         if journals:
             self.add_comments_for_issue(issue_obj.number, journals)
 
+
+        self.label_service.clear_labels(issue_obj.number)
+
+        #
+        #   Add status!
+        #
+        #   "status": {
+        #        "id": 1, 
+        #       "name": "New"
+        #   },
+        #
+        status = rd.get('status', None)
+        if status and status.has_key('id') and status.has_key('name'):
+            #git_status_name = '(%s) %s' % (status['id'], status['name'])
+            status_name = self.label_service.format_status_name(status)
+            if status_name:
+                self.label_service.add_labels_to_issue(issue_obj.number, [status_name] )
+        
+
+        #
+        #   Add tracker!
+        #
+        #    "tracker": {
+        #       "id": 2, 
+        #        "name": "Feature"
+        #   },
+        #
+        tracker = rd.get('tracker', None)
+        if tracker and tracker.has_key('id') and tracker.has_key('name'):
+            tracker_name = self.label_service.format_tracker_name(tracker)
+            if tracker_name:
+                self.label_service.add_labels_to_issue(issue_obj.number, [tracker_name] )
+
+
+        #
+        #   Add component!
+        #
+        #   "custom_fields": [
+        #        {
+        #            "id": 1, 
+        #            "value": "0", 
+        #            "name": "Usability Testing"
+        #        }
+        #    ],        
+        #
+        custom_fields = rd.get('custom_fields', None)
+        if custom_fields and len(custom_fields) > 0:
+            for cf in custom_fields:
+                if cf.has_key('id') and cf.has_key('name'):
+                    component_name = self.label_service.format_component_name(cf)
+                    if component_name:
+                        self.label_service.add_labels_to_issue(issue_obj.number, [component_name] )
+
+
+        
         # Add milestones!
         #
         # "fixed_version": {
@@ -163,7 +221,7 @@ if __name__=='__main__':
     #milestone_service = pygithub3.services.issues.Milestones(**auth)
     #comments_service = pygithub3.services.issues.Comments(**auth)
     
-    fname = '/Users/rmp553/Documents/iqss-git/redmine2github/working_files/redmine_issues/2014-0702/00081.json'
+    fname = '/Users/rmp553/Documents/iqss-git/redmine2github/working_files/redmine_issues/2014-0702/03385.json'
     gm = GithubIssueMaker()
     gm.make_github_issue(fname, {})
         
