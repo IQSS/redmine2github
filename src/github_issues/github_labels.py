@@ -25,6 +25,8 @@ class LabelService:
         label_url = 'https://api.github.com/repos/%s/%s/issues/%s/labels' % (GITHUB_TARGET_USERNAME, GITHUB_TARGET_REPOSITORY, issue_id)
         req = requests.delete(label_url, auth=self.auth)
         print 'labels deleted!' 
+        
+        
 
     def add_labels_to_issue(self, issue_id, labels=[]):
         msg('Add Labels to Issue.  Issue: [%s] Labels: [%s]' % (issue_id, labels))
@@ -66,6 +68,7 @@ class LabelService:
             #git_tracker_name = '(%s) %s' % (tracker['id'], tracker['name'])
     
         return None
+        
         
     def format_status_name(self, status):
         if not type(status) is dict:

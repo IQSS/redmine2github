@@ -234,7 +234,7 @@ if __name__=='__main__':
         if fname.endswith('.json'):
             
             num = int(fname.replace('.json', ''))
-            if num < 4012: continue
+            if num < 3902: continue
             msg('Add issue from: %s' % fname)
             cnt+=1
             fullname = os.path.join(root_dir, fname)
@@ -246,7 +246,7 @@ if __name__=='__main__':
                 msg('sleep 2 secs')
                 time.sleep(2)
         
-        
+            #sys.exit(0)
         
         
         
