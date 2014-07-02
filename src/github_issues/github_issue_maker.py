@@ -15,8 +15,9 @@ from jinja2 import Environment, PackageLoader
 
 from utils.msg_util import *
 from github_issues.md_translate import translate_for_github
+from github_issues.github_milestones import GithubMilestoneManager
 
-from settings.base import GITHUB_LOGIN, GITHUB_PASSWORD, GITHUB_TARGET_REPOSITORY, GITHUB_TARGET_USERNAME
+from settings.base import get_github_auth   #GITHUB_LOGIN, GITHUB_PASSWORD, GITHUB_TARGET_REPOSITORY, GITHUB_TARGET_USERNAME
 from settings.base import REDMINE_SERVER#, REDMINE_API_KEY, REDMINE_ISSUES_DIRECTORY
 
 import pygithub3
@@ -30,13 +31,13 @@ class GithubIssueMaker:
     def __init__(self):        
         self.github_conn = None
         self.comments_service = None
+        self.milestone_manager = GithubMilestoneManager()
         self.jinja_env = Environment(loader=PackageLoader('github_issues', 'templates'))
-    
-    
+
     def get_comments_service(self):
         if self.comments_service is None:
-            auth = dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)
-            self.comments_service = pygithub3.services.issues.Comments(**auth)
+            #auth = dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)
+            self.comments_service = pygithub3.services.issues.Comments(**get_github_auth())
             #labels_service = pygithub3.services.issues.Labels(**auth)
             # #labels_service = pygithub3.services.issues.Labels(**auth)
             #pygithub3.services.issues.Comments(**config)
@@ -46,10 +47,9 @@ class GithubIssueMaker:
     def get_github_conn(self):
         
         if self.github_conn is None:
-            auth = dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)
-            self.github_conn = pygithub3.Github(**auth)
+            self.github_conn = pygithub3.Github(**get_github_auth())
         return self.github_conn
-        
+    
         
     def make_github_issue(self, redmine_json_fname, redmine2github_id_map={}):
         
@@ -75,7 +75,7 @@ class GithubIssueMaker:
         
         description_info = template.render(desc_dict)
         
-        msg(description_info)
+        #msg(description_info)
         
         # Create the issues dictionary--for the github API
         #
@@ -84,12 +84,12 @@ class GithubIssueMaker:
                     , 'body' : description_info\
                     }
 
-        #issue_obj = self.get_github_conn().issues.update(4, issue_dict)
         
         #  Create the issue on github
         #
         #
-        issue_obj = self.get_github_conn().issues.create(issue_dict)
+        #issue_obj = self.get_github_conn().issues.create(issue_dict)
+        issue_obj = self.get_github_conn().issues.update(4, issue_dict)
         
         msgt('issue number: %s' % issue_obj.number)
         msg('issue id: %s' % issue_obj.id)
@@ -100,13 +100,33 @@ class GithubIssueMaker:
 
         print( redmine2github_id_map)
         
-        msg(dir(issue_obj))
+        #msg(dir(issue_obj))
         
         # Add the redmine comments (journals) as github comments
         #
         journals = rd.get('journals', None)
         if journals:
             self.add_comments_for_issue(issue_obj.number, journals)
+
+        # Add milestones!
+        #
+        # "fixed_version": {
+        #    "id": 96, 
+        #    "name": "4.0 - review for weekly assignment"
+        # },
+        #
+        fixed_version = rd.get('fixed_version', None)
+        if fixed_version:
+            mstone_name = fixed_version.get('name', None)
+            if mstone_name: 
+                milestone_number = self.milestone_manager.get_create_milestone_number(mstone_name)
+                if not milestone_number:
+                    msgx('Milestone number not found for: [%s]' % mstone_name)
+            
+                # Add milestone to issue
+                mstone_dict =  { 'milestone' : milestone_number}
+                print(mstone_dict)
+                issue_obj = self.get_github_conn().issues.update(issue_obj.number, mstone_dict)
 
 
     def add_comments_for_issue(self, issue_num, journals):
@@ -135,10 +155,14 @@ class GithubIssueMaker:
             msg('issue_url: %s' % comment_obj.issue_url)
             msg('html_url: %s' % comment_obj.html_url)
             msg('url: %s' % comment_obj.url)
-            msg(dir(comment_obj))
+            #msg(dir(comment_obj))
 
 
 if __name__=='__main__':
+    #auth = dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)
+    #milestone_service = pygithub3.services.issues.Milestones(**auth)
+    #comments_service = pygithub3.services.issues.Comments(**auth)
+    
     fname = '/Users/rmp553/Documents/iqss-git/redmine2github/working_files/redmine_issues/2014-0702/00081.json'
     gm = GithubIssueMaker()
     gm.make_github_issue(fname, {})

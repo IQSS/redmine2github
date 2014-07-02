@@ -18,5 +18,11 @@ GITHUB_SERVER = 'https://api.github.com'
 GITHUB_LOGIN = 'github username'
 GITHUB_PASSWORD = getpass.getpass('Enter github pw:')
 
+GITHUB_TARGET_REPOSITORY = 'test-issue-migrate'
+GITHUB_TARGET_USERNAME = 'target-repo-github-username'
+
 WORKING_FILES_DIRECTORY = join(PROJECT_ROOT, 'working_files')
 REDMINE_ISSUES_DIRECTORY = join(WORKING_FILES_DIRECTORY, 'redmine_issues')
+
+def get_github_auth():
+   return dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)
