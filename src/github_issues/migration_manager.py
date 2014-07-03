@@ -132,8 +132,8 @@ if __name__=='__main__':
     json_input_directory = os.path.join(REDMINE_ISSUES_DIRECTORY, '2014-0702')
     kwargs = dict(include_comments=True\
                 , include_assignee=False\
-                , redmine_issue_start_number=4123\
-                , redmine_issue_end_number=4134\
+                , redmine_issue_start_number=3405\
+                , redmine_issue_end_number=9000\
                 , user_mapping_filename=USER_MAP_FILE       # optional
                 , label_mapping_filename=LABEL_MAP_FILE     # optional
                 , milestone_mapping_filename=MILESTONE_MAP_FILE # optional

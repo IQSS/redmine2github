@@ -168,11 +168,13 @@ class MilestoneHelper:
 
 
         mstone_name = fixed_version['name']
+        msg('Milestone: %s' % mstone_name)
         if mstone_name: 
             if self.using_milestone_map:
                 mstone_info = self.milestone_lookup.get(mstone_name, None)
                 if mstone_info is None:
-                    msgx('Milestone not found in map: %s' % mstone_name_fmt)
+                    msgt('Milestone not found in map: %s' % mstone_name)
+                    mstone_name = mstone_name       # Use original name
                 else:
                     mstone_name = mstone_info.name
             
