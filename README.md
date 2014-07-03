@@ -80,8 +80,7 @@ redmine_type, redmine_name, github_label_name, github_label_color
 status, In Design, Status 3: In Design/Dev,996600
 status, In Dev, Status 3: In Design/Dev,996600
 ``` 
-
-   In the example above, the redmine status names "In Design" and "In Dev" are _both_ mapped to the label named "Status 3: In Design/Dev"
+   In the example above, the "redmine_name"s "In Design" and "In Dev" are _both_ mapped to the label named "Status 3: In Design/Dev"
 
 + When the map is read, the values are trimmed.  e.g. ",    In Design ," would become "In Design" with leading/trailing spaces removed 
     
