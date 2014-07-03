@@ -53,7 +53,7 @@ class GithubIssueMaker:
             self.github_conn = pygithub3.Github(**get_github_auth())
         return self.github_conn
     
-    def format_name_for_github(self, author_name):
+    def format_name_for_github(self, author_name, include_at_sign=True):
         """
         (1) Try the user map
         (2) If no match, return the name
@@ -62,13 +62,35 @@ class GithubIssueMaker:
             return None
             
         if self.user_map_helper:
-            github_name = self.user_map_helper.get_github_user(author_name)
+            github_name = self.user_map_helper.get_github_user(author_name, include_at_sign)
             if github_name is not None:
                 return github_name
         return author_name
         
+    
+    def get_assignee(self, redmine_issue_dict):
+        """
+        If a redmine user has a github account mapped, add the person as the assignee
         
-    def make_github_issue(self, redmine_json_fname, include_comments=True):
+        "assigned_to": {
+            "id": 4, 
+            "name": "Philip Durbin"
+        },
+        /cc @kneath @jresig
+        """
+        if not type(redmine_issue_dict) is dict:
+            return None
+    
+        redmine_name = redmine_issue_dict.get('assigned_to', {}).get('name', None)
+        if redmine_name is None:
+            return None
+        
+        github_username = self.format_name_for_github(redmine_name, include_at_sign=False)
+        
+        return github_username
+    
+    
+    def make_github_issue(self, redmine_json_fname, **kwargs):
         """
         Create a GitHub issue from JSON for a Redmine issue.
         
@@ -78,7 +100,10 @@ class GithubIssueMaker:
         """
         if not os.path.isfile(redmine_json_fname):
             msgx('ERROR.  make_github_issue. file not found: %s' % redmine_json_fname)
-            
+        
+        include_comments = kwargs.get('include_comments', True)
+        include_assignee = kwargs.get('include_assignee', True)
+        
         json_str = open(redmine_json_fname, 'r').read()
         rd = json.loads(json_str)       # The redmine issue as a python dict
 
@@ -115,7 +140,12 @@ class GithubIssueMaker:
         if milestone_number:
             github_issue_dict['milestone'] = milestone_number
 
-        msg( github_issue_dict['labels'])
+        if include_assignee:
+            assignee = self.get_assignee(rd)
+            if assignee:
+                github_issue_dict['assignee'] = assignee
+            
+        msg( github_issue_dict)
         
         #
         # (3) Create the issue on github

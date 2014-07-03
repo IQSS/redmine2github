@@ -22,6 +22,8 @@ class MigrationManager:
         self.redmine_json_directory = redmine_json_directory
         
         self.include_comments = kwargs.get('include_comments', True)
+        self.include_assignee = kwargs.get('include_assignee', True)
+
 
         self.user_mapping_filename = kwargs.get('user_mapping_filename', None)
 
@@ -100,7 +102,8 @@ class MigrationManager:
             # Start processing at or after redmine_issue_START_number
             if not redmine_issue_num >= self.redmine_issue_start_number:
                 msg('Skipping Redmine issue: %s (start at %s)' % (redmine_issue_num, self.redmine_issue_start_number ))
-                continue        # skip this
+                continue        # skip tAttempt to create issue
+                # his
             
             # Don't process after the redmine_issue_END_number
             if self.redmine_issue_end_number:
@@ -112,7 +115,10 @@ class MigrationManager:
 
             msgt('(%s) Loading redmine issue: [%s] from file [%s]' % (issue_cnt, redmine_issue_num, json_fname))
             json_fname_fullpath = os.path.join(self.redmine_json_directory, json_fname)
-            gm.make_github_issue(json_fname_fullpath, self.include_comments)
+            gm_kwargs = { 'include_assignee' : self.include_assignee \
+                         , 'include_comments' : self.include_comments \
+                        }
+            gm.make_github_issue(json_fname_fullpath, **gm_kwargs)
         
             if issue_cnt % 50 == 0:
                 msgt('sleep 2 seconds....')
@@ -121,6 +127,7 @@ class MigrationManager:
 if __name__=='__main__':
     json_input_directory = os.path.join(REDMINE_ISSUES_DIRECTORY, '2014-0702')
     kwargs = dict(include_comments=True\
+                , include_assignee=False\
                 , redmine_issue_start_number=4096\
                 , redmine_issue_end_number=4096\
                 , user_mapping_filename=USER_MAP_FILE
