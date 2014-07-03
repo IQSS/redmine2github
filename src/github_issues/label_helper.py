@@ -84,9 +84,8 @@ class LabelHelper:
             req = requests.post(label_url, data=json.dumps(data), auth=self.auth)
             msg(req.text)
             msg(req.status_code)
-            if req.status_code == 200:
+            if req.status_code in [ 200, 201]:
                 msg('Label created with color!')
-                msg(req.json())
                 continue
             else:
                 msgx('Create label with color failed!')

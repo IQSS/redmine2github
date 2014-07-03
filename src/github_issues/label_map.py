@@ -7,7 +7,7 @@ class LabelInfo:
     
     def __init__(self, row):
         if not row or not len(row) == 4:
-            msgx('Expected 4 value in this row: %s' % row)
+            msgx('Expected 4 values in this row: %s' % row)
         
         for idx, item in enumerate(row):
             self.__dict__[self.ATTR_NAMES[idx]] = item.strip()
@@ -44,6 +44,8 @@ class LabelMap:
             for row in map_reader:
                 row_num += 1
                 if row_num == 1: continue       # skip header row
+                if len(row) == 0: continue
+                if row[0].startswith('#'): continue
                 label_info = LabelInfo(row)
                 
                 self.label_lookup.update(label_info.get_label_dict_info())                

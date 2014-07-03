@@ -22,6 +22,9 @@ class UserMapHelper:
             for row in map_reader:
                 row_num +=1
                 if row_num == 1: continue       # skip header row
+                if len(row) == 0: continue
+                if row[0].startswith('#'): continue
+                
                 if len(row) ==2:
                     if row[1].strip():
                         self.map_lookup[row[0].strip()] = row[1].strip()
