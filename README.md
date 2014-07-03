@@ -69,6 +69,8 @@ The label map is optional.  It allows you to assign label names and colors by cr
     * The status, tracker, priority, or custom_fields names in Redmine issues are made into GitHub labels
 
 **Map Notes** - How is the map used
+
+
     + The map is specfied in the [settings/local.py file](https://github.com/IQSS/redmine2github/blob/master/src/settings/local_sample.py)
     + If a status, tracker, priority, or custom_field name in a Redmine ticket is NOT found in the map, that name value will NOT be moved to GitHub
     + The map file is "dumb." If you would like to map more than one status name to a single status label, simply repeat it.
