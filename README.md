@@ -38,10 +38,13 @@ Scripts to migrate redmine tickets to github issues.  This is for a 1-time move-
 
 #### (2) Migrate your issues to a github repository
 
+
 ---
 
 Note 1:  Once added, a github issue **cannot be deleted**.  Therefore, to test your migration, create a new "scratch" github repository.  Once you're satisfied that the migration works, delete the scratch repository.   
+
 ---
+
 
 --- 
 
@@ -53,4 +56,5 @@ Note 2: The current [GitHub API limit](https://developer.github.com/v3/rate_limi
     + Call 2: Read each GitHub issue
     + At the bottom of the description, use the Redmine->GitHub issue number mapping to add related issue numbers
     + Update the GitHub description
-        
+
+---        
