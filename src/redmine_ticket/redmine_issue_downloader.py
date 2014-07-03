@@ -23,13 +23,13 @@ class RedmineIssueDownloader:
     TIME_FORMAT_STRING = '%Y-%m%d'
 
     # Redmine tickets are written to JSON files with the naming convention  "(issue id).json"
-    # For file sorting, preceding zeros are tacked in.  
+    # For file sorting, preceding zeros are tacked on.  
     #   Example: If  ZERO_PADDING_LEVEL=5:
     #               issue #375 is written to file "00375.json"
     #               issue #1789 is written to file "01789.json"
     #               issue #2 is written to file "00002.json"
     #
-    # If your issue numbers are more than 99,999 then increase the ZERO_PADDING_LEVEL
+    # If your issue numbers go beyond 99,999 then increase the ZERO_PADDING_LEVEL
     #
     ZERO_PADDING_LEVEL = 5
     

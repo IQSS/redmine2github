@@ -15,8 +15,8 @@ from jinja2 import Environment, PackageLoader
 
 from utils.msg_util import *
 from github_issues.md_translate import translate_for_github
-from github_issues.github_milestones import GithubMilestoneManager
-from github_issues.github_labels import LabelService
+from github_issues.milestone_helper import MilestoneHelper
+from github_issues.label_helper import LabelHelper
 
 
 from settings.base import get_github_auth   #GITHUB_LOGIN, GITHUB_PASSWORD, GITHUB_TARGET_REPOSITORY, GITHUB_TARGET_USERNAME
@@ -33,8 +33,8 @@ class GithubIssueMaker:
     def __init__(self):        
         self.github_conn = None
         self.comments_service = None
-        self.milestone_manager = GithubMilestoneManager()
-        self.label_service = LabelService()
+        self.milestone_manager = MilestoneHelper()
+        self.label_helper = LabelHelper()
         self.jinja_env = Environment(loader=PackageLoader('github_issues', 'templates'))
 
     def get_comments_service(self):
@@ -55,7 +55,13 @@ class GithubIssueMaker:
     
         
     def make_github_issue(self, redmine_json_fname, redmine2github_id_map={}):
+        """
+        Create a GitHub issue from JSON for a Redmine issue.
         
+        - Format the GitHub description to include original redmine info: author, link back to redmine ticket, etc
+        - Add/Create Labels
+        - Add/Create Milestones
+        """
         if not os.path.isfile(redmine_json_fname):
             msgx('ERROR.  make_github_issue. file not found: %s' % redmine_json_fname)
             
@@ -63,9 +69,9 @@ class GithubIssueMaker:
         rd = json.loads(json_str)       # The redmine issue as a python dict
 
         #msg(json.dumps(rd, indent=4))
-        msg('Attempt to create issue: [%s]' % rd.get('subject'))
+        msg('Attempt to create issue: [#%s][%s]' % (rd.get('id'), rd.get('subject') ))
         
-        # Create the github issue description 
+        # (1) Format the github issue description 
         #
         #
         template = self.jinja_env.get_template('description.md')
@@ -78,21 +84,26 @@ class GithubIssueMaker:
         
         description_info = template.render(desc_dict)
         
-        #msg(description_info)
-        
-        # Create the issues dictionary--for the github API
         #
+        # (2) Create the dictionary for the GitHub issue--for the github API
         #
-        issue_dict = { 'title': rd.get('subject')\
+        #self.label_helper.clear_labels(151)
+        github_issue_dict = { 'title': rd.get('subject')\
                     , 'body' : description_info\
+                    , 'labels' : self.label_helper.get_label_names(rd)
                     }
+                    
+        milestone_number = self.milestone_manager.get_create_milestone(rd)
+        if milestone_number:
+            github_issue_dict['milestone'] = milestone_number
 
+        msg( github_issue_dict['labels'])
         
-        #  Create the issue on github
         #
+        # (3) Create the issue on github
         #
-        issue_obj = self.get_github_conn().issues.create(issue_dict)
-        #issue_obj = self.get_github_conn().issues.update(4, issue_dict)
+        issue_obj = self.get_github_conn().issues.create(github_issue_dict)
+        #issue_obj = self.get_github_conn().issues.update(151, github_issue_dict)
         
         msgt('issue number: %s' % issue_obj.number)
         msg('issue id: %s' % issue_obj.id)
@@ -103,69 +114,16 @@ class GithubIssueMaker:
 
         print( redmine2github_id_map)
         
-        #msg(dir(issue_obj))
-        
-        # Add the redmine comments (journals) as github comments
+        #
+        # (4) Add the redmine comments (journals) as github comments
         #
         journals = rd.get('journals', None)
         if journals:
             self.add_comments_for_issue(issue_obj.number, journals)
 
 
-        #self.label_service.clear_labels(issue_obj.number)
 
-        #
-        #   Add status!
-        #
-        #   "status": {
-        #        "id": 1, 
-        #       "name": "New"
-        #   },
-        #
-        status = rd.get('status', None)
-        if status and status.has_key('id') and status.has_key('name'):
-            #git_status_name = '(%s) %s' % (status['id'], status['name'])
-            status_name = self.label_service.format_status_name(status)
-            if status_name:
-                self.label_service.add_labels_to_issue(issue_obj.number, [status_name] )
-        
-
-        #
-        #   Add tracker!
-        #
-        #    "tracker": {
-        #       "id": 2, 
-        #        "name": "Feature"
-        #   },
-        #
-        tracker = rd.get('tracker', None)
-        if tracker and tracker.has_key('id') and tracker.has_key('name'):
-            tracker_name = self.label_service.format_tracker_name(tracker)
-            if tracker_name:
-                self.label_service.add_labels_to_issue(issue_obj.number, [tracker_name] )
-
-
-        #
-        #   Add component!
-        #
-        #   "custom_fields": [
-        #        {
-        #            "id": 1, 
-        #            "value": "0", 
-        #            "name": "Usability Testing"
-        #        }
-        #    ],        
-        #
-        custom_fields = rd.get('custom_fields', None)
-        if custom_fields and len(custom_fields) > 0:
-            for cf in custom_fields:
-                if cf.has_key('id') and cf.has_key('name'):
-                    component_name = self.label_service.format_component_name(cf)
-                    if component_name:
-                        self.label_service.add_labels_to_issue(issue_obj.number, [component_name] )
-
-
-        
+    def xget_create_milestone(self, redmine_issue_dict):
         # Add milestones!
         #
         # "fixed_version": {
@@ -173,18 +131,29 @@ class GithubIssueMaker:
         #    "name": "4.0 - review for weekly assignment"
         # },
         #
-        fixed_version = rd.get('fixed_version', None)
-        if fixed_version:
-            mstone_name = fixed_version.get('name', None)
-            if mstone_name: 
-                milestone_number = self.milestone_manager.get_create_milestone_number(mstone_name)
-                if not milestone_number:
-                    msgx('Milestone number not found for: [%s]' % mstone_name)
+        if not type(redmine_issue_dict) is dict:
+            return None
             
-                # Add milestone to issue
-                mstone_dict =  { 'milestone' : milestone_number}
-                print(mstone_dict)
-                issue_obj = self.get_github_conn().issues.update(issue_obj.number, mstone_dict)
+        fixed_version = rd.get('fixed_version', {})
+        if not fixed_version.has_key('name'):
+            return None
+        
+            
+        mstone_name = fixed_version['name']
+        if mstone_name: 
+            milestone_number = self.get_create_milestone_number(mstone_name)
+            if not milestone_number:
+                msgx('Milestone number not found for: [%s]' % mstone_name)
+
+            return milestone_number
+    
+        return None
+
+        # Add milestone to issue
+        #        mstone_dict =  { 'milestone' : milestone_number}
+        #        print(mstone_dict)
+        #    issue_obj = self.get_github_conn().issues.update(issue_obj.number, mstone_dict)
+
 
 
     def add_comments_for_issue(self, issue_num, journals):
@@ -224,9 +193,12 @@ if __name__=='__main__':
     #gm.make_github_issue(fname, {})
 
     import time
-    gm = GithubIssueMaker()
-
     
+    issue_filename = '/Users/rmp553/Documents/iqss-git/redmine2github/working_files/redmine_issues/2014-0702/04156.json'
+    gm = GithubIssueMaker()
+    gm.make_github_issue(issue_filename, {})
+    
+    sys.exit(0)
     root_dir = '/Users/rmp553/Documents/iqss-git/redmine2github/working_files/redmine_issues/2014-0702/'
     
     cnt =0

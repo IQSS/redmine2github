@@ -23,7 +23,7 @@ from settings.base import REDMINE_SERVER#, REDMINE_API_KEY, REDMINE_ISSUES_DIREC
 
 import pygithub3
 
-class GithubMilestoneManager:
+class MilestoneHelper:
     """
     Certain redmine attributes, such as "fixed_version", will be translated into milestones
     """
@@ -93,10 +93,43 @@ class GithubMilestoneManager:
             #pygithub3.services.issues.Comments(**config)
 
         return self.milestone_service
-        
+       
+   
+    def get_create_milestone(self, redmine_issue_dict):
+        # Add milestones!
+        #
+        # "fixed_version": {
+        #    "id": 96, 
+        #    "name": "4.0 - review for weekly assignment"
+        # },
+        #
+        if not type(redmine_issue_dict) is dict:
+            return None
+
+        fixed_version = redmine_issue_dict.get('fixed_version', {})
+        if not fixed_version.has_key('name'):
+            return None
+
+
+        mstone_name = fixed_version['name']
+        if mstone_name: 
+            milestone_number = self.get_create_milestone_number(mstone_name)
+            if not milestone_number:
+                msgx('Milestone number not found for: [%s]' % mstone_name)
+
+            return milestone_number
+
+        return None
+
+        # Add milestone to issue
+        #        mstone_dict =  { 'milestone' : milestone_number}
+        #        print(mstone_dict)
+        #    issue_obj = self.get_github_conn().issues.update(issue_obj.number, mstone_dict)
+
+
         
 if __name__=='__main__':
-    mstones = GithubMilestoneManager()
+    mstones = MilestoneHelper()
     #print(mstones.get_create_milestone_number('Pre-Alpha'))
     #print(mstones.get_mile_stone_number('Pre-Alpha'))
     print(mstones.get_create_milestone_number('We did it'))

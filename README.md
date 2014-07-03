@@ -1,6 +1,6 @@
 ## redmine2github
 
-Scripts to migrate redmine tickets to github issues.  This is for a 1-time move--so it's a mix of automation and manual decisions
+Scripts to migrate redmine tickets to github issues.  This is for a 1-time move--so it's a mix of automation and manual decisions.  e.g., Get-it-done, but make the process repeatable.
 
 ### Setup with [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/en/latest/install.html#basic-installation)
 
@@ -48,13 +48,13 @@ Note 1:  Once added, a github issue **cannot be deleted**.  Therefore, to test y
 
 --- 
 
-Note 2: The current [GitHub API limit](https://developer.github.com/v3/rate_limit/) is 5,000/day.  Adding each issue may use up to 3 API calls.  Plan appropriately.
+Note 2: The current [GitHub API limit](https://developer.github.com/v3/rate_limit/) is 5,000/day.  Adding each issue may have 1-n API calls.  Plan appropriately.
 
-+ API Call 1: Create issue with labels, milestones, assignee 
++ 1 API Call: Create issue with labels, milestones, assignee 
     + This process creates a json file mapping { Redmine issue number : GitHub issue number}
-+ API Calls 2 & 3 (optional): After all issues are moved
-    + Call 2: Read each GitHub issue
++ 0-n API Calls for comments: A single API call is used to transfer each comment
++ 2 API Calls for related issues (optional): After all issues are moved
+    + Call 1: Read each GitHub issue
     + At the bottom of the description, use the Redmine->GitHub issue number mapping to add related issue numbers
-    + Update the GitHub description
-
+    + Call 2: Update the GitHub description
 ---        
