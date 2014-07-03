@@ -88,7 +88,7 @@ class RedmineIssueDownloader:
         """
         pass
         issue_dict = {}
-        issue_fname = join(self.issue_dirname, 'issue_list.txt') 
+        issue_fname = join(self.issue_dirname, 'issue_list.json') 
         msg('Gathering issue information.... (may take a minute)')
 
         ticket_cnt = self.redmine_project.total_count       # not available w/o iterating through issues.....
@@ -131,7 +131,7 @@ class RedmineIssueDownloader:
         
         """
         issue_dict = {}
-        issue_fname = join(self.issue_dirname, 'issue_list.txt') 
+        issue_fname = join(self.issue_dirname, 'issue_list.json') 
         msg('Gathering issue information.... (may take a minute)')
         cnt = 0
         
