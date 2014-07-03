@@ -9,6 +9,7 @@ import re
 from settings.base import get_github_auth, REDMINE_ISSUES_DIRECTORY, USER_MAP_FILE
 
 
+from github_issues.user_map_helper import UserMapHelper
 from github_issues.github_issue_maker import GithubIssueMaker
 from utils.msg_util import *
 
@@ -66,12 +67,29 @@ class MigrationManager:
                     msgx('ERROR: The end issue number [%s] must greater than or equal to the start issue number [%s]' % (self.redmine_issue_end_number, self.redmine_issue_start_number))                
                     
         
+    def get_user_map_helper(self):
+        if not self.user_mapping_filename:
+            return None
+            
+        user_map_helper = UserMapHelper(self.user_mapping_filename)
+        
+        if user_map_helper.get_key_count() == 0:
+            msgx('ERROR. get_user_map_helper.  No names found in user map: %s' % self.user_mapping_filename)
+        
+        return user_map_helper
+        
     def migrate_issues(self):
         
         self.sanity_check()
 
-        gm = GithubIssueMaker()
-        
+        # Load a map if a filename was passed to the constructor
+        #
+        user_map_helper = self.get_user_map_helper()
+        if user_map_helper:
+            gm = GithubIssueMaker(user_map_helper=user_map_helper)
+        else:
+            gm = GithubIssueMaker()
+            
         # Iterate through json files
         issue_cnt = 0
         for json_fname in self.get_redmine_json_fnames():
@@ -80,28 +98,33 @@ class MigrationManager:
             redmine_issue_num = int(json_fname.replace('.json', ''))
 
             # Start processing at or after redmine_issue_START_number
-            if self.redmine_issue_start_number < redmine_issue_num:
+            if not redmine_issue_num >= self.redmine_issue_start_number:
+                msg('Skipping Redmine issue: %s (start at %s)' % (redmine_issue_num, self.redmine_issue_start_number ))
                 continue        # skip this
             
             # Don't process after the redmine_issue_END_number
-            if self.redmine_issue_end_number and redmine_issue_num > self.redmine_issue_end_number:
-                break
+            if self.redmine_issue_end_number:
+                if redmine_issue_num > self.redmine_issue_end_number:
+                    print redmine_issue_num, self.redmine_issue_end_number
+                    break
             
             issue_cnt += 1
 
             msgt('(%s) Loading redmine issue: [%s] from file [%s]' % (issue_cnt, redmine_issue_num, json_fname))
             json_fname_fullpath = os.path.join(self.redmine_json_directory, json_fname)
-            gm.make_github_issue(json_fname_fullpath, {})
+            gm.make_github_issue(json_fname_fullpath, self.include_comments)
         
-            if cnt % 50 == 0:
+            if issue_cnt % 50 == 0:
                 msgt('sleep 2 seconds....')
                 time.sleep(2)
 
 if __name__=='__main__':
     json_input_directory = os.path.join(REDMINE_ISSUES_DIRECTORY, '2014-0702')
-    kwargs = dict(redmine_issue_start_number=4130\
-                , redmine_issue_end_number=4130\
-             )
+    kwargs = dict(include_comments=True\
+                , redmine_issue_start_number=4096\
+                , redmine_issue_end_number=4096\
+                , user_mapping_filename=USER_MAP_FILE
+            )
     mm = MigrationManager(json_input_directory, **kwargs)
     mm.migrate_issues()
 

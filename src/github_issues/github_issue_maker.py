@@ -17,7 +17,7 @@ from utils.msg_util import *
 from github_issues.md_translate import translate_for_github
 from github_issues.milestone_helper import MilestoneHelper
 from github_issues.label_helper import LabelHelper
-
+import csv
 
 from settings.base import get_github_auth, REDMINE_SERVER
 
@@ -29,13 +29,14 @@ class GithubIssueMaker:
     These issues should be moved from Redmine in order of issue.id.  This will allow mapping of Redmine issue ID's against newly created Github issued IDs.  e.g., can translate related issues numbers, etc.
     """
     
-    def __init__(self):        
+    def __init__(self, user_map_helper=None):        
         self.github_conn = None
         self.comments_service = None
         self.milestone_manager = MilestoneHelper()
         self.label_helper = LabelHelper()
         self.jinja_env = Environment(loader=PackageLoader('github_issues', 'templates'))
-
+        self.user_map_helper = user_map_helper
+        
     def get_comments_service(self):
         if self.comments_service is None:
             #auth = dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)
@@ -52,8 +53,22 @@ class GithubIssueMaker:
             self.github_conn = pygithub3.Github(**get_github_auth())
         return self.github_conn
     
+    def format_name_for_github(self, author_name):
+        """
+        (1) Try the user map
+        (2) If no match, return the name
+        """
+        if not author_name:
+            return None
+            
+        if self.user_map_helper:
+            github_name = self.user_map_helper.get_github_user(author_name)
+            if github_name is not None:
+                return github_name
+        return author_name
         
-    def make_github_issue(self, redmine_json_fname, redmine2github_id_map={}):
+        
+    def make_github_issue(self, redmine_json_fname, include_comments=True):
         """
         Create a GitHub issue from JSON for a Redmine issue.
         
@@ -74,11 +89,15 @@ class GithubIssueMaker:
         #
         #
         template = self.jinja_env.get_template('description.md')
+        
+        author_name = rd.get('author', {}).get('name', None)
+        author_github_username = self.format_name_for_github(author_name)
+        
         desc_dict = {'description' : translate_for_github(rd.get('description', 'no description'))\
                     , 'redmine_link' : os.path.join(REDMINE_SERVER, 'issues', '%d' % rd.get('id'))\
                     , 'start_date' : rd.get('start_date', None)\
-                    , 'author_name' : rd.get('author', {}).get('name', None)\
-                    
+                    , 'author_name' : author_name\
+                    , 'author_github_username' : author_github_username\
         }
         
         description_info = template.render(desc_dict)
@@ -104,54 +123,25 @@ class GithubIssueMaker:
         issue_obj = self.get_github_conn().issues.create(github_issue_dict)
         #issue_obj = self.get_github_conn().issues.update(151, github_issue_dict)
         
-        msgt('issue number: %s' % issue_obj.number)
+        msgt('Github issue created: %s' % issue_obj.number)
         msg('issue id: %s' % issue_obj.id)
+        msg('issue url: %s' % issue_obj.html_url)
         
         # Map the new github Issue number to the redmine issue number
         #
-        redmine2github_id_map.update({ rd.get('id', 'unknown') : issue_obj.number })
+        #redmine2github_id_map.update({ rd.get('id', 'unknown') : issue_obj.number })
 
-        print( redmine2github_id_map)
+        #print( redmine2github_id_map)
         
         #
         # (4) Add the redmine comments (journals) as github comments
         #
+        if not include_comments:
+            return
+            
         journals = rd.get('journals', None)
         if journals:
             self.add_comments_for_issue(issue_obj.number, journals)
-
-
-
-    def xget_create_milestone(self, redmine_issue_dict):
-        # Add milestones!
-        #
-        # "fixed_version": {
-        #    "id": 96, 
-        #    "name": "4.0 - review for weekly assignment"
-        # },
-        #
-        if not type(redmine_issue_dict) is dict:
-            return None
-            
-        fixed_version = rd.get('fixed_version', {})
-        if not fixed_version.has_key('name'):
-            return None
-        
-            
-        mstone_name = fixed_version['name']
-        if mstone_name: 
-            milestone_number = self.get_create_milestone_number(mstone_name)
-            if not milestone_number:
-                msgx('Milestone number not found for: [%s]' % mstone_name)
-
-            return milestone_number
-    
-        return None
-
-        # Add milestone to issue
-        #        mstone_dict =  { 'milestone' : milestone_number}
-        #        print(mstone_dict)
-        #    issue_obj = self.get_github_conn().issues.update(issue_obj.number, mstone_dict)
 
 
 
@@ -169,18 +159,24 @@ class GithubIssueMaker:
             notes = j.get('notes', None)
             if not notes:
                 continue
+                
+            author_name = j.get('user', {}).get('name', None)
+            author_github_username = self.format_name_for_github(author_name)
+            
             note_dict = { 'description' : translate_for_github(notes)\
                          , 'note_date' : j.get('created_on', None)\
-                         , 'author_name' : j.get('user', {}).get('name', None)\
+                         , 'author_name' : author_name\
+                         , 'author_github_username' : author_github_username\
                          }
             comment_info =  comment_template.render(note_dict)
             comment_obj = self.get_comments_service().create(issue_num, comment_info)
+            dashes()
             msg('comment created')
 
-            msgt('id: %s' % comment_obj.id)
-            msg('issue_url: %s' % comment_obj.issue_url)
+            msg('comment id: %s' % comment_obj.id)
+            msg('api issue_url: %s' % comment_obj.issue_url)
+            msg('api comment url: %s' % comment_obj.url)
             msg('html_url: %s' % comment_obj.html_url)
-            msg('url: %s' % comment_obj.url)
             #msg(dir(comment_obj))
 
 
