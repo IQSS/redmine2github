@@ -187,7 +187,7 @@ class LabelHelper:
          - tracker
          - priority
          - component
-        
+         - category
         :returns: list with formatted label names
         """
         if not type(redmine_issue_dict) is dict:
@@ -209,6 +209,11 @@ class LabelHelper:
         priority_label_name = self.get_label_from_id_name(redmine_issue_dict, 'priority', 'Priority:', non_formatted)
         if priority_label_name:
             label_names.append(priority_label_name)
+
+        # Add category
+        category_label_name = self.get_label_from_id_name(redmine_issue_dict, 'category', 'Category:', non_formatted)
+        if category_label_name:
+            label_names.append(category_label_name)
 
         # Add component
         #   "custom_fields": [
