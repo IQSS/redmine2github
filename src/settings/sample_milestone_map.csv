@@ -22,14 +22,14 @@ redmine_milestone, github_milestone_name, due_date_yyyy_mm_dd
 4.0 - review for post 4.0, Dataverse 4.0: Beta 1, 2014-0601
 4.0 - review for weekly assignment, Dataverse 4.0: Beta 1, 2014-0601
 4.1, Dataverse 4.0: Release, 2014-1027
-Future: Ingest, File Upload, Future - Dataverse 4.x, 
-Future: Internationalization, Future - Dataverse 4.x, 
-Future: Performance, Downloads, Future - Dataverse 4.x, 
-Future: Security / Shibboleth, Future - Dataverse 4.x, 
-Future: Subset / Analysis separation, Future - Dataverse 4.x, 
-Future: World Map integration, Future - Dataverse 4.x, 
-Review Post 4.0, Future - Dataverse 4.x, 
-Review: Clean up issues, Future - Dataverse 4.x, 
-Review: Harvesting / new data, Future - Dataverse 4.x, 
-Review: before each new release, Future - Dataverse 4.x, 
-Review: for 4.1, Future - Dataverse 4.x, 
+Future: Ingest, File Upload, Future - Dataverse 4.x, None
+Future: Internationalization, Future - Dataverse 4.x, None
+Future: Performance, Downloads, Future - Dataverse 4.x, None
+Future: Security / Shibboleth, Future - Dataverse 4.x, None
+Future: Subset / Analysis separation, Future - Dataverse 4.x, None
+Future: World Map integration, Future - Dataverse 4.x, None
+Review Post 4.0, Future - Dataverse 4.x, None
+Review: Clean up issues, Future - Dataverse 4.x, None
+Review: Harvesting / new data, Future - Dataverse 4.x, None
+Review: before each new release, Future - Dataverse 4.x, None
+Review: for 4.1, Future - Dataverse 4.x, None
