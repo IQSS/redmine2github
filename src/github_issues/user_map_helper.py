@@ -18,13 +18,17 @@ class UserMapHelper:
 
         with open(self.user_map_fname, 'rb') as csvfile:
             map_reader = csv.reader(csvfile, delimiter=',')#, quotechar='|')
+            row_num = 0
             for row in map_reader:
+                row_num +=1
+                if row_num == 1: continue       # skip header row
                 if len(row) ==2:
-                    self.map_lookup[row[0].strip()] = row[1].strip()
+                    if row[1].strip():
+                        self.map_lookup[row[0].strip()] = row[1].strip()
 
+        msgt('User map loaded with %s names' % len(self.map_lookup))
         for k, v in self.map_lookup.items():
-            msgt('[%s] -> [%s]' % (k, v))
-        msg('User map loaded with %s names' % len(self.map_lookup))
+            msg('[%s] -> [%s]' % (k, v))
 
     def get_github_user(self, redmine_name, with_github_at=True):
         if not redmine_name:

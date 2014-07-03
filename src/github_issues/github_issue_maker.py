@@ -29,11 +29,11 @@ class GithubIssueMaker:
     These issues should be moved from Redmine in order of issue.id.  This will allow mapping of Redmine issue ID's against newly created Github issued IDs.  e.g., can translate related issues numbers, etc.
     """
     
-    def __init__(self, user_map_helper=None):        
+    def __init__(self, user_map_helper=None, label_mapping_filename=None):        
         self.github_conn = None
         self.comments_service = None
         self.milestone_manager = MilestoneHelper()
-        self.label_helper = LabelHelper()
+        self.label_helper = LabelHelper(label_mapping_filename)
         self.jinja_env = Environment(loader=PackageLoader('github_issues', 'templates'))
         self.user_map_helper = user_map_helper
         
@@ -133,7 +133,7 @@ class GithubIssueMaker:
         #self.label_helper.clear_labels(151)
         github_issue_dict = { 'title': rd.get('subject')\
                     , 'body' : description_info\
-                    , 'labels' : self.label_helper.get_label_names(rd)
+                    , 'labels' : self.label_helper.get_label_names_from_issue(rd)
                     }
                     
         milestone_number = self.milestone_manager.get_create_milestone(rd)

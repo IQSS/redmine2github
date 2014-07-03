@@ -64,14 +64,26 @@ Note 2: The current [GitHub API limit](https://developer.github.com/v3/rate_limi
 The label map is optional.  It allows you to assign label names and colors by creating a label map file.
 
 + See [Sample Label Map, sample_label_map.csv](https://github.com/IQSS/redmine2github/blob/master/src/settings/sample_label_map.csv)
+
+---
+
++ The [**redmine_type** column](https://github.com/IQSS/redmine2github/blob/master/src/settings/sample_label_map.csv) is for user convenience only, it is ignored by the program.  So watch out for name collisions
+
+---
+
 + Pertains to Redmine name values in fields **status, tracker, priority, or custom_fields**
 + If no map is specified in the [MigrationManager kwargs](https://github.com/IQSS/redmine2github/blob/master/src/github_issues/migration_manager.py#L127):
-    * The status, tracker, priority, or custom_fields names in Redmine issues are made into GitHub labels
+    * The status, tracker, priority, or custom_fields names in Redmine issues are made into GitHub labels.  See "def get_label_names" in the [label_helper.py file](https://github.com/IQSS/redmine2github/blob/master/src/github_issues/label_helper.py)
+        * A Redmine status of "New" would turn into label "Status: New"
+        * A Redmine tracker of "Feature" would turn into label "Tracker: Feature"
+        * A Redmine priority of "Urgent" would turn into label "Priority: Urgent"
+        * A Redmine custom field of "UX/UI" turns into label "Component: UX/UI"
+    * If no map is specified, then newly created labels will not have a color
 
 **Map Notes** - How is the map used
 
 
-+ The map is specfied in the [settings/local.py file](https://github.com/IQSS/redmine2github/blob/master/src/settings/local_sample.py)
++ The map is specfied in the [settings/local.py file](https://github.com/IQSS/redmine2github/blob/master/src/settings/local_sample.py#L32) under LABEL_MAP_FILE
 + If a status, tracker, priority, or custom_field name in a Redmine ticket is NOT found in the map, that name value will NOT be moved to GitHub
 + The map file is "dumb." If you would like to map more than one status name to a single status label, simply repeat it.
     + In the example below, the "redmine_name"s "In Design" and "In Dev" are _both_ mapped to the label named "Status 3: In Design/Dev"

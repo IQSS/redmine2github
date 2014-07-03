@@ -6,7 +6,7 @@ if __name__=='__main__':
 
 import time
 import re
-from settings.base import get_github_auth, REDMINE_ISSUES_DIRECTORY, USER_MAP_FILE
+from settings.base import get_github_auth, REDMINE_ISSUES_DIRECTORY, USER_MAP_FILE, LABEL_MAP_FILE
 
 
 from github_issues.user_map_helper import UserMapHelper
@@ -26,6 +26,7 @@ class MigrationManager:
 
 
         self.user_mapping_filename = kwargs.get('user_mapping_filename', None)
+        self.label_mapping_filename = kwargs.get('label_mapping_filename', None)
 
         # Start loading with issue number (int) based on json file name
         self.redmine_issue_start_number = kwargs.get('redmine_issue_start_number', 0)
@@ -57,6 +58,10 @@ class MigrationManager:
         if self.user_mapping_filename:
             if not os.path.isfile(self.user_mapping_filename):
                 msgx('ERROR: User mapping file not found [%s]' % self.user_mapping_filename)                
+
+        if self.label_mapping_filename:
+            if not os.path.isfile(self.label_mapping_filename):
+                msgx('ERROR: Label mapping file not found [%s]' % self.label_mapping_filename)                
         
         if not type(self.redmine_issue_start_number) is int:
             msgx('ERROR: The start issue number is not an integer [%s]' % self.redmine_issue_start_number)                
@@ -86,11 +91,10 @@ class MigrationManager:
 
         # Load a map if a filename was passed to the constructor
         #
-        user_map_helper = self.get_user_map_helper()
-        if user_map_helper:
-            gm = GithubIssueMaker(user_map_helper=user_map_helper)
-        else:
-            gm = GithubIssueMaker()
+        user_map_helper = self.get_user_map_helper()    # None is ok
+        # Note: for self.label_mapping_filename, None is ok
+        gm = GithubIssueMaker(user_map_helper=user_map_helper\
+                        , label_mapping_filename=self.label_mapping_filename )
             
         # Iterate through json files
         issue_cnt = 0
