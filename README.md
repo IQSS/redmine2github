@@ -80,7 +80,10 @@ Note 2: The current [GitHub API limit](https://developer.github.com/v3/rate_limi
     + Call 1: Read each GitHub issue
     + At the bottom of the description, use the Redmine->GitHub issue number mapping to add related issue numbers
     + Call 2: Update the GitHub description
+
+
 ---        
+
 
 #### Quick script
 
