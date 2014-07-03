@@ -35,6 +35,29 @@ Scripts to migrate redmine tickets to github issues.  This is for a 1-time move-
     }
     
 ```
+* Currently inefficient, but ok for not/for this job (rp)
+
+#### Quick script
+
++ cd into the src/redmine_ticket directory
++ update the bottom of the "redmine_issue_downloader.py" file
++ Currently looks something like this:
+
+```python
+if __name__=='__main__':
+    from settings.base import REDMINE_SERVER, REDMINE_API_KEY, REDMINE_ISSUES_DIRECTORY
+    #rn = RedmineIssueDownloader(REDMINE_SERVER, REDMINE_API_KEY, 'dvn', REDMINE_ISSUES_DIRECTORY)
+    rn = RedmineIssueDownloader(REDMINE_SERVER, REDMINE_API_KEY, 1, REDMINE_ISSUES_DIRECTORY)
+    rn.download_tickets()
+```
+
++ run it:
+
+```
+../redmine2github/src/github_issues> python redmine_issue_downloader.py
+```
+
+
 
 #### (2) Migrate your issues to a github repository
 
@@ -58,6 +81,36 @@ Note 2: The current [GitHub API limit](https://developer.github.com/v3/rate_limi
     + At the bottom of the description, use the Redmine->GitHub issue number mapping to add related issue numbers
     + Call 2: Update the GitHub description
 ---        
+
+#### Quick script
+
++ cd into the src/github_issues directory
++ update the bottom of the "migration_manage.py" file
++ Currently looks something like this:
+
+```python
+if __name__=='__main__':
+    json_input_directory = os.path.join(REDMINE_ISSUES_DIRECTORY, '2014-0702')
+    kwargs = dict(include_comments=True\
+                , include_assignee=False\
+                , redmine_issue_start_number=4123\
+                , redmine_issue_end_number=4134\
+                , user_mapping_filename=USER_MAP_FILE       # optional
+                , label_mapping_filename=LABEL_MAP_FILE     # optional
+                , milestone_mapping_filename=MILESTONE_MAP_FILE # optional
+            )
+    mm = MigrationManager(json_input_directory, **kwargs)
+    mm.migrate_issues()
+```
+
++ run it:
+
+```
+../redmine2github/src/github_issues>python migration_manager.py
+```
+
+
+
 
 #### Label Map Notes
 

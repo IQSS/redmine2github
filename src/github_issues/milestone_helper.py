@@ -2,7 +2,7 @@ from __future__ import print_function
 import os
 import sys
 import json
-
+import csv
 
 if __name__=='__main__':
     SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,17 +22,73 @@ from settings.base import get_github_auth   #GITHUB_LOGIN, GITHUB_PASSWORD, GITH
 from settings.base import REDMINE_SERVER#, REDMINE_API_KEY, REDMINE_ISSUES_DIRECTORY
 
 import pygithub3
+from datetime import datetime
 
+class MilestoneInfo:
+    ATTR_NAMES = """redmine_milestone name due_date""".split()
+    
+    def __init__(self, row):
+        if not row or not len(row) == 3:
+            msgx('Expected 3 values in this row: %s' % row)
+        
+        for idx, item in enumerate(row):
+            self.__dict__[self.ATTR_NAMES[idx]] = item.strip()
+
+        if self.due_date == 'None':
+            self.due_date = None
+        else:
+            self.due_date = datetime.strptime(self.due_date, '%Y-%m%d')
+
+    def get_label_dict_info(self):
+        return { self.redmine_milestone : self}
+        
 class MilestoneHelper:
     """
     Certain redmine attributes, such as "fixed_version", will be translated into milestones
     """
     
-    def __init__(self):     
+    def __init__(self, milestone_mapping_filename=None):     
         self.github_conn = None
         self.milestone_service = None
-        self.get_github_conn()   
+        self.milestone_mapping_filename = milestone_mapping_filename
         
+        self.milestone_lookup = {}    # { redmine_name : LabelInfo }
+        self.using_milestone_map = False
+        
+        self.load_milestone_lookup()
+        
+        self.get_github_conn()   
+    
+    
+    def load_milestone_lookup(self):
+        if self.milestone_mapping_filename is None:
+            self.using_milestone_map = False
+            return
+        
+        self.using_milestone_map = True
+        if not os.path.isfile(self.milestone_mapping_filename):
+            msgx('Error: user name file not found: %s' % self.milestone_mapping_filename)
+
+        msgt('Loading milestone map: %s' % self.milestone_mapping_filename)
+        with open(self.milestone_mapping_filename, 'rb') as csvfile:
+            map_reader = csv.reader(csvfile, delimiter=',')#, quotechar='|')
+            row_num = 0
+            for row in map_reader:
+                row_num += 1
+                if row_num == 1: continue       # skip header row
+                if len(row) == 0: continue
+                if row[0].startswith('#'): continue
+                milestone_info = MilestoneInfo(row)
+
+                self.milestone_lookup.update(milestone_info.get_label_dict_info())                
+
+        msg('Label dict loaded as follows.\nRemember: the "redmine_type" column in the .csv is ignored by the system--it is only for user convenience')
+        dashes()
+        for redmine_name, milestone_info in self.milestone_lookup.items():
+            msg('[%s] -> [%s][%s]' % (redmine_name, milestone_info.name, milestone_info.due_date))
+
+    
+    
     def get_github_conn(self):
 
         if self.github_conn is None:
@@ -113,6 +169,13 @@ class MilestoneHelper:
 
         mstone_name = fixed_version['name']
         if mstone_name: 
+            if self.using_milestone_map:
+                mstone_info = self.milestone_lookup.get(mstone_name, None)
+                if mstone_info is None:
+                    msgx('Milestone not found in map: %s' % mstone_name_fmt)
+                else:
+                    mstone_name = mstone_info.name
+            
             milestone_number = self.get_create_milestone_number(mstone_name)
             if not milestone_number:
                 msgx('Milestone number not found for: [%s]' % mstone_name)

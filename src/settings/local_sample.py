@@ -34,6 +34,10 @@ USER_MAP_FILE = join(WORKING_FILES_DIRECTORY, 'redmine2github_user_map.csv')
 #   example, see settings/sample_label_map.csv
 LABEL_MAP_FILE = join(WORKING_FILES_DIRECTORY, 'redmine2github_label_map.csv')
 
+# (optional) csv file mapping Redmine "target version" to GitHub milestones.
+# Manually created.  Doesn't check for name collisions
+#   example, see settings/sample_milestone_map.csv
+MILESTONE_MAP_FILE = join(WORKING_FILES_DIRECTORY, 'redmine2github_milestone_map.csv')
 
 def get_github_auth():
    return dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)

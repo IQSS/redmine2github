@@ -6,7 +6,7 @@ if __name__=='__main__':
 
 import time
 import re
-from settings.base import get_github_auth, REDMINE_ISSUES_DIRECTORY, USER_MAP_FILE, LABEL_MAP_FILE
+from settings.base import get_github_auth, REDMINE_ISSUES_DIRECTORY, USER_MAP_FILE, LABEL_MAP_FILE, MILESTONE_MAP_FILE
 
 
 from github_issues.user_map_helper import UserMapHelper
@@ -27,6 +27,7 @@ class MigrationManager:
 
         self.user_mapping_filename = kwargs.get('user_mapping_filename', None)
         self.label_mapping_filename = kwargs.get('label_mapping_filename', None)
+        self.milestone_mapping_filename = kwargs.get('milestone_mapping_filename', None)
 
         # Start loading with issue number (int) based on json file name
         self.redmine_issue_start_number = kwargs.get('redmine_issue_start_number', 0)
@@ -55,13 +56,10 @@ class MigrationManager:
         if len(fnames)==0:
             msgx('ERROR: Directory [%s] does contain any .json files' % self.redmine_json_directory)
         
-        if self.user_mapping_filename:
-            if not os.path.isfile(self.user_mapping_filename):
-                msgx('ERROR: User mapping file not found [%s]' % self.user_mapping_filename)                
-
-        if self.label_mapping_filename:
-            if not os.path.isfile(self.label_mapping_filename):
-                msgx('ERROR: Label mapping file not found [%s]' % self.label_mapping_filename)                
+        for mapping_filename in [self.user_mapping_filename, self.label_mapping_filename, self.milestone_mapping_filename ]:
+            if mapping_filename:   # This mapping files may be None
+                if not os.path.isfile(mapping_filename):
+                    msgx('ERROR: Mapping file not found [%s]' % mapping_filename)                
         
         if not type(self.redmine_issue_start_number) is int:
             msgx('ERROR: The start issue number is not an integer [%s]' % self.redmine_issue_start_number)                
@@ -94,7 +92,9 @@ class MigrationManager:
         user_map_helper = self.get_user_map_helper()    # None is ok
         # Note: for self.label_mapping_filename, None is ok
         gm = GithubIssueMaker(user_map_helper=user_map_helper\
-                        , label_mapping_filename=self.label_mapping_filename )
+                        , label_mapping_filename=self.label_mapping_filename\
+                        , milestone_mapping_filename=self.milestone_mapping_filename
+                         )
             
         # Iterate through json files
         issue_cnt = 0
@@ -132,10 +132,11 @@ if __name__=='__main__':
     json_input_directory = os.path.join(REDMINE_ISSUES_DIRECTORY, '2014-0702')
     kwargs = dict(include_comments=True\
                 , include_assignee=False\
-                , redmine_issue_start_number=4160\
-                , redmine_issue_end_number=4160\
-                , user_mapping_filename=USER_MAP_FILE
-                , label_mapping_filename=LABEL_MAP_FILE
+                , redmine_issue_start_number=4123\
+                , redmine_issue_end_number=4134\
+                , user_mapping_filename=USER_MAP_FILE       # optional
+                , label_mapping_filename=LABEL_MAP_FILE     # optional
+                , milestone_mapping_filename=MILESTONE_MAP_FILE # optional
             )
     mm = MigrationManager(json_input_directory, **kwargs)
     mm.migrate_issues()
