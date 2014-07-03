@@ -17,7 +17,7 @@ Scripts to migrate redmine tickets to github issues.  This is for a 1-time move-
         
 ### Workflow
         
-## (1) Download your open redmine issues
+#### (1) Download your open redmine issues
 
 * Each issue is saved as a .json file, including relevant "children", "journals", "watchers", "relations"
     * The file naming convention is by ticket issue number.  
@@ -36,7 +36,7 @@ Scripts to migrate redmine tickets to github issues.  This is for a 1-time move-
     
 ```
 
-## (2) Migrate your issues to a github repository
+#### (2) Migrate your issues to a github repository
 
 ---
 
