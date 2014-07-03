@@ -27,7 +27,7 @@ GITHUB_TARGET_USERNAME = config.GITHUB_TARGET_USERNAME
 WORKING_FILES_DIRECTORY = config.WORKING_FILES_DIRECTORY
 REDMINE_ISSUES_DIRECTORY = config.REDMINE_ISSUES_DIRECTORY 
 
-# (optional) json dict mapping redmine users to github users
+# (optional) csv file mapping redmine users to github users.  Manually created.  Doesn't check for name collisions
 USER_MAP_FILE = config.WORKING_FILES_DIRECTORY
 
 def get_github_auth():

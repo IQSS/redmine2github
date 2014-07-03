@@ -19,8 +19,7 @@ from github_issues.milestone_helper import MilestoneHelper
 from github_issues.label_helper import LabelHelper
 
 
-from settings.base import get_github_auth   #GITHUB_LOGIN, GITHUB_PASSWORD, GITHUB_TARGET_REPOSITORY, GITHUB_TARGET_USERNAME
-from settings.base import REDMINE_SERVER#, REDMINE_API_KEY, REDMINE_ISSUES_DIRECTORY
+from settings.base import get_github_auth, REDMINE_SERVER
 
 import pygithub3
 
