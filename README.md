@@ -58,3 +58,28 @@ Note 2: The current [GitHub API limit](https://developer.github.com/v3/rate_limi
     + At the bottom of the description, use the Redmine->GitHub issue number mapping to add related issue numbers
     + Call 2: Update the GitHub description
 ---        
+
+#### Label Map Notes
+
+The label map is optional.  It allows you to assign label names and colors by creating a label map file.
+
++ See [Sample Label Map, sample_label_map.csv](https://github.com/IQSS/redmine2github/blob/master/src/settings/sample_label_map.csv)
++ Pertains to Redmine name values in fields **status, tracker, priority, or custom_fields**
++ If no map is specified in the [MigrationManager kwargs](https://github.com/IQSS/redmine2github/blob/master/src/github_issues/migration_manager.py#L127):
+    * The status, tracker, priority, or custom_fields names in Redmine issues are made into GitHub labels
+
+**Map Notes** - How is the map used
+    + The map is specfied in the [settings/local.py file](https://github.com/IQSS/redmine2github/blob/master/src/settings/local_sample.py)
+    + If a status, tracker, priority, or custom_field name in a Redmine ticket is NOT found in the map, that name value will NOT be moved to GitHub
+    + The map file is "dumb." If you would like to map more than one status name to a single status label, simply repeat it.
+    
+```csv
+redmine_type, redmine_name, github_label_name, github_label_color
+status, In Design, Status 3: In Design/Dev,996600
+status, In Dev, Status 3: In Design/Dev,996600
+``` 
+
+        In the example above, the redmine status names "In Design" and "In Dev" are _both_ mapped to the label named "Status 3: In Design/Dev"
+    + When the map is read, the values are trimmed.  e.g. ",    In Design ," would become "In Design" with leading/trailing spaces removed 
+    
+
