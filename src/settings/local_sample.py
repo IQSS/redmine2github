@@ -24,8 +24,16 @@ GITHUB_TARGET_USERNAME = 'target-repo-github-username'
 WORKING_FILES_DIRECTORY = join(PROJECT_ROOT, 'working_files')
 REDMINE_ISSUES_DIRECTORY = join(WORKING_FILES_DIRECTORY, 'redmine_issues')
 
-# (optional) csv file mapping redmine users to github users.  Manually created.  Doesn't check for name collisions
+# (optional) csv file mapping Redmine users to github users.  
+# Manually created.  Doesn't check for name collisions
+# example, see settings/sample_user_map.csv
 USER_MAP_FILE = join(WORKING_FILES_DIRECTORY, 'redmine2github_user_map.csv')
+
+# (optional) csv file mapping Redmine status, tracker, priority, and custom fields names to github labels.
+# Manually created.  Doesn't check for name collisions
+#   example, see settings/sample_label_map.csv
+LABEL_MAP_FILE = join(WORKING_FILES_DIRECTORY, 'redmine2github_label_map.csv')
+
 
 def get_github_auth():
    return dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)

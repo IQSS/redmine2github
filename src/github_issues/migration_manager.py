@@ -131,6 +131,7 @@ if __name__=='__main__':
                 , redmine_issue_start_number=4096\
                 , redmine_issue_end_number=4096\
                 , user_mapping_filename=USER_MAP_FILE
+                , label_mapping_filename=LABEL_MAP_FILE
             )
     mm = MigrationManager(json_input_directory, **kwargs)
     mm.migrate_issues()

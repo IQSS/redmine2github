@@ -27,8 +27,15 @@ GITHUB_TARGET_USERNAME = config.GITHUB_TARGET_USERNAME
 WORKING_FILES_DIRECTORY = config.WORKING_FILES_DIRECTORY
 REDMINE_ISSUES_DIRECTORY = config.REDMINE_ISSUES_DIRECTORY 
 
-# (optional) csv file mapping redmine users to github users.  Manually created.  Doesn't check for name collisions
-USER_MAP_FILE = config.USER_MAP_FILE
+# (optional) csv file mapping Redmine users to github users.  
+# Manually created.  Doesn't check for name collisions
+#   example, see settings/sample_user_map.csv
+USER_MAP_FILE = config.USER_MAP_FILE        
+
+# (optional) csv file mapping Redmine status, tracker, priority, and custom fields names to github labels.
+# Manually created.  Doesn't check for name collisions
+#   example, see settings/sample_label_map.csv
+LABEL_MAP_FILE = config.LABEL_MAP_FILE      
 
 def get_github_auth():
    return dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)
