@@ -136,7 +136,7 @@ The label map is optional.  It allows you to assign label names and colors by cr
         * A Redmine custom field of "UX/UI" turns into label "Component: UX/UI"
     * If no map is specified, then newly created labels will not have a color
 
-**Map Notes** - How is the map used
+**Map Notes** - How is the map used?
 
 
 + The map is specfied in the [settings/local.py file](https://github.com/IQSS/redmine2github/blob/master/src/settings/local_sample.py#L32) under LABEL_MAP_FILE
