@@ -8,7 +8,7 @@ sys.path.append(PROJECT_ROOT)
 #
 #   Redmine API information
 #
-REDMINE_SERVER = 'https://redmine.hmdc.harvard.edu'
+REDMINE_SERVER = 'https://redmine.my-org.edu'
 
 # See http://www.redmine.org/projects/redmine/wiki/Rest_api#Authentication
 # "You can find your API key on your account page..."
