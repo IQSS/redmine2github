@@ -24,6 +24,9 @@ GITHUB_TARGET_USERNAME = 'target-repo-github-username'
 WORKING_FILES_DIRECTORY = join(PROJECT_ROOT, 'working_files')
 REDMINE_ISSUES_DIRECTORY = join(WORKING_FILES_DIRECTORY, 'redmine_issues')
 
+# JSON file mapping { redmine issue # : github issue # }
+REDMINE_TO_GITHUB_MAP_FILE = join(WORKING_FILES_DIRECTORY, 'redmine2github_issue_map.json')
+
 # (optional) csv file mapping Redmine users to github users.  
 # Manually created.  Doesn't check for name collisions
 # example, see settings/sample_user_map.csv

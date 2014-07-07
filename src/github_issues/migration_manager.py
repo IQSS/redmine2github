@@ -6,7 +6,8 @@ if __name__=='__main__':
 
 import time
 import re
-from settings.base import get_github_auth, REDMINE_ISSUES_DIRECTORY, USER_MAP_FILE, LABEL_MAP_FILE, MILESTONE_MAP_FILE
+import json
+from settings.base import get_github_auth, REDMINE_ISSUES_DIRECTORY, USER_MAP_FILE, LABEL_MAP_FILE, MILESTONE_MAP_FILE, REDMINE_TO_GITHUB_MAP_FILE
 
 
 from github_issues.user_map_helper import UserMapHelper
@@ -17,9 +18,13 @@ from utils.msg_util import *
 class MigrationManager:
     """Move the files to github"""
     
-    def __init__(self, redmine_json_directory, **kwargs):
+    def __init__(self, redmine_json_directory, redmine2github_map_file, **kwargs):
         
         self.redmine_json_directory = redmine_json_directory
+        
+        # Keep track of redmine issue #'s and related github issue #'s
+        self.redmine2github_map_file = redmine2github_map_file
+        
         
         self.include_comments = kwargs.get('include_comments', True)
         self.include_assignee = kwargs.get('include_assignee', True)
@@ -61,6 +66,11 @@ class MigrationManager:
                 if not os.path.isfile(mapping_filename):
                     msgx('ERROR: Mapping file not found [%s]' % mapping_filename)                
         
+        
+        if not os.path.isdir(os.path.dirname(self.redmine2github_map_file)):
+            msgx('ERROR: Directory not found for redmine2github_map_file [%s]' % self.redmine2github_map_file)                
+            
+        
         if not type(self.redmine_issue_start_number) is int:
             msgx('ERROR: The start issue number is not an integer [%s]' % self.redmine_issue_start_number)                
 
@@ -83,6 +93,67 @@ class MigrationManager:
         
         return user_map_helper
         
+        
+    def save_dict_to_file(self, d):
+        
+        d_str = json.dumps(d)
+        fh = open(self.redmine2github_map_file, 'w')
+        fh.write(d_str)
+        fh.close()
+
+        
+    def get_dict_from_map_file(self):
+        
+        # new dict, file doesn't exist yet
+        if not os.path.isfile(self.redmine2github_map_file):
+            return {}   # {redmine issue # : github issue #}
+        
+        fh = open(self.redmine2github_map_file, 'r')
+        content = fh.read()
+        fh.close()
+        
+        # let it blow up if incorrect
+        return json.loads(content)
+
+
+    def migrate_related_tickets(self):
+        """
+        After github issues are already migrated, go back and udpate the descriptions to include "related tickets
+        
+        
+        """
+        
+        gm = GithubIssueMaker()
+         
+        issue_cnt = 0
+        redmine2github_issue_map = self.get_dict_from_map_file()
+        
+        for json_fname in self.get_redmine_json_fnames():
+            
+            # Pull the issue number from the file name
+            redmine_issue_num = int(json_fname.replace('.json', ''))
+
+            # Start processing at or after redmine_issue_START_number
+            if not redmine_issue_num >= self.redmine_issue_start_number:
+                msg('Skipping Redmine issue: %s (start at %s)' % (redmine_issue_num, self.redmine_issue_start_number ))
+                continue        # skip tAttempt to create issue
+                # his
+            
+            # Don't process after the redmine_issue_END_number
+            if self.redmine_issue_end_number:
+                if redmine_issue_num > self.redmine_issue_end_number:
+                    print redmine_issue_num, self.redmine_issue_end_number
+                    break
+            
+            issue_cnt += 1
+
+            msgt('(%s) Loading redmine issue: [%s] from file [%s]' % (issue_cnt, redmine_issue_num, json_fname))
+            json_fname_fullpath = os.path.join(self.redmine_json_directory, json_fname)
+        
+            gm.update_github_issue(json_fname_fullpath, redmine2github_issue_map)
+            
+    
+    
     def migrate_issues(self):
         
         self.sanity_check()
@@ -98,6 +169,8 @@ class MigrationManager:
             
         # Iterate through json files
         issue_cnt = 0
+        
+        mapping_dict = self.get_dict_from_map_file()    # { redmine issue : github issue }
         for json_fname in self.get_redmine_json_fnames():
             
             # Pull the issue number from the file name
@@ -122,25 +195,32 @@ class MigrationManager:
             gm_kwargs = { 'include_assignee' : self.include_assignee \
                          , 'include_comments' : self.include_comments \
                         }
-            gm.make_github_issue(json_fname_fullpath, **gm_kwargs)
+            github_issue_number = gm.make_github_issue(json_fname_fullpath, **gm_kwargs)
+        
+            if github_issue_number:
+                mapping_dict.update({ redmine_issue_num : github_issue_number})
+                self.save_dict_to_file(mapping_dict)
         
             if issue_cnt % 50 == 0:
                 msgt('sleep 2 seconds....')
                 time.sleep(2)
 
 if __name__=='__main__':
-    json_input_directory = os.path.join(REDMINE_ISSUES_DIRECTORY, '2014-0702')
+    json_input_directory = os.path.join(REDMINE_ISSUES_DIRECTORY, '2014-0707')
+
     kwargs = dict(include_comments=True\
                 , include_assignee=False\
-                , redmine_issue_start_number=3405\
+                , redmine_issue_start_number=3379\
                 , redmine_issue_end_number=9000\
-                , user_mapping_filename=USER_MAP_FILE       # optional
+                #, user_mapping_filename=USER_MAP_FILE       # optional
                 , label_mapping_filename=LABEL_MAP_FILE     # optional
                 , milestone_mapping_filename=MILESTONE_MAP_FILE # optional
             )
-    mm = MigrationManager(json_input_directory, **kwargs)
-    mm.migrate_issues()
-
+    mm = MigrationManager(json_input_directory\
+                            , REDMINE_TO_GITHUB_MAP_FILE\
+                            , **kwargs)
+    #mm.migrate_issues()
+    mm.migrate_related_tickets()
 
 
         

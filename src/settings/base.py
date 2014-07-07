@@ -27,6 +27,9 @@ GITHUB_TARGET_USERNAME = config.GITHUB_TARGET_USERNAME
 WORKING_FILES_DIRECTORY = config.WORKING_FILES_DIRECTORY
 REDMINE_ISSUES_DIRECTORY = config.REDMINE_ISSUES_DIRECTORY 
 
+# JSON file mapping { redmine issue # : github issue # }
+REDMINE_TO_GITHUB_MAP_FILE = config.REDMINE_TO_GITHUB_MAP_FILE
+
 # (optional) csv file mapping Redmine users to github users.  
 # Manually created.  Doesn't check for name collisions
 #   example, see settings/sample_user_map.csv

@@ -39,13 +39,10 @@ class GithubIssueMaker:
         
     def get_comments_service(self):
         if self.comments_service is None:
-            #auth = dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)
             self.comments_service = pygithub3.services.issues.Comments(**get_github_auth())
-            #labels_service = pygithub3.services.issues.Labels(**auth)
-            # #labels_service = pygithub3.services.issues.Labels(**auth)
-            #pygithub3.services.issues.Comments(**config)
-            
+           
         return self.comments_service
+
         
     def get_github_conn(self):
         
@@ -90,6 +87,106 @@ class GithubIssueMaker:
         return github_username
     
     
+    def update_github_issue(self, redmine_json_fname, redmine2github_issue_map):
+        """
+        Update a GitHub issue with related tickets as specfied in Redmine
+        
+        - Read the current github description
+        - Add related notes to the bottom of description
+        - Update the description
+        
+        "relations": [
+              {
+                  "delay": null, 
+                  "issue_to_id": 4160, 
+                  "issue_id": 4062, 
+                  "id": 438, 
+                  "relation_type": "relates"
+              }, 
+              {
+                  "delay": null, 
+                  "issue_to_id": 3643, 
+                  "issue_id": 4160, 
+                  "id": 439, 
+                  "relation_type": "relates"
+              }
+          ], 
+          "id": 4160,
+        """
+        if not os.path.isfile(redmine_json_fname):
+            msgx('ERROR.  update_github_issue. file not found: %s' % redmine_json_fname)
+        
+        json_str = open(redmine_json_fname, 'r').read()
+        rd = json.loads(json_str)       # The redmine issue as a python dict
+        
+        if rd.get('relations', None) is None:
+            msg('no relations')
+            return
+            
+        redmine_issue_num = rd.get('id', None)
+        if redmine_issue_num is None:
+            return
+            
+        github_issue_num = redmine2github_issue_map.get(str(redmine_issue_num), None)
+        if github_issue_num is None:
+            msg('Redmine issue not in nap')
+            return
+
+        related_tickets = []
+        original_related_tickets = []
+        for rel in rd.get('relations'):
+            issue_to_id = rel.get('issue_to_id', None)
+            if issue_to_id is None:
+                continue
+            if rd.get('id') == issue_to_id:  # skip relations pointing to this ticket
+                continue
+            
+            original_related_tickets.append(issue_to_id)
+            related_github_issue_num = redmine2github_issue_map.get(str(issue_to_id), None)
+            msg(related_github_issue_num)
+            if related_github_issue_num:
+                related_tickets.append(related_github_issue_num)
+    
+
+        # Update github issue!!
+        if len(original_related_tickets) == 0:
+            return
+            
+        original_issues_formatted = [ """[%s](%s)""" % (x, self.format_redmine_issue_link(x)) for x in original_related_tickets]
+
+        original_issues_str = ', '.join(original_issues_formatted)
+        
+        related_issues_formatted = [ '#%d' % x for x in related_tickets]
+        related_issue_str = ', '.join(related_issues_formatted)
+        msg(related_issue_str)
+        
+        
+        try:
+            issue = self.get_github_conn().issues.get(number=github_issue_num)
+        except pygithub3.exceptions.NotFound:
+            msg('Issue not found!')
+            return
+            
+        template = self.jinja_env.get_template('related_issues.md')
+            
+        template_params = { 'original_description' : issue.body\
+                            , 'original_issues' : original_issues_str\
+                            , 'related_issues' : related_issue_str}
+
+        updated_description = template.render(template_params)
+
+        issue = self.get_github_conn().issues.update(number=github_issue_num, data={'body':updated_description})
+        
+        msg('Issue updated: %s' % issue.body)
+        
+        
+    def format_redmine_issue_link(self, issue_id):
+        if issue_id is None:
+            return None
+            
+        return os.path.join(REDMINE_SERVER, 'issues', '%d' % issue_id) 
+        
+        
     def make_github_issue(self, redmine_json_fname, **kwargs):
         """
         Create a GitHub issue from JSON for a Redmine issue.
@@ -119,7 +216,8 @@ class GithubIssueMaker:
         author_github_username = self.format_name_for_github(author_name)
         
         desc_dict = {'description' : translate_for_github(rd.get('description', 'no description'))\
-                    , 'redmine_link' : os.path.join(REDMINE_SERVER, 'issues', '%d' % rd.get('id'))\
+                    , 'redmine_link' : self.format_redmine_issue_link(rd.get('id'))\
+                    , 'redmine_issue_num' : rd.get('id')\
                     , 'start_date' : rd.get('start_date', None)\
                     , 'author_name' : author_name\
                     , 'author_github_username' : author_github_username\
@@ -166,12 +264,12 @@ class GithubIssueMaker:
         #
         # (4) Add the redmine comments (journals) as github comments
         #
-        if not include_comments:
-            return
-            
-        journals = rd.get('journals', None)
-        if journals:
-            self.add_comments_for_issue(issue_obj.number, journals)
+        if include_comments:
+            journals = rd.get('journals', None)
+            if journals:
+                self.add_comments_for_issue(issue_obj.number, journals)
+
+        return issue_obj.number
 
 
 
