@@ -150,7 +150,7 @@ class MigrationManager:
             msgt('(%s) Loading redmine issue: [%s] from file [%s]' % (issue_cnt, redmine_issue_num, json_fname))
             json_fname_fullpath = os.path.join(self.redmine_json_directory, json_fname)
         
-            gm.update_github_issue(json_fname_fullpath, redmine2github_issue_map)
+            gm.update_github_issue_with_related(json_fname_fullpath, redmine2github_issue_map)
             
     
     
@@ -210,8 +210,8 @@ if __name__=='__main__':
 
     kwargs = dict(include_comments=True\
                 , include_assignee=False\
-                , redmine_issue_start_number=1828\
-                , redmine_issue_end_number=1828\
+                , redmine_issue_start_number=3430\
+                , redmine_issue_end_number=3430\
                 #, user_mapping_filename=USER_MAP_FILE       # optional
                 , label_mapping_filename=LABEL_MAP_FILE     # optional
                 , milestone_mapping_filename=MILESTONE_MAP_FILE # optional
@@ -219,8 +219,8 @@ if __name__=='__main__':
     mm = MigrationManager(json_input_directory\
                             , REDMINE_TO_GITHUB_MAP_FILE\
                             , **kwargs)
-    mm.migrate_issues()
-    #mm.migrate_related_tickets()
+    #mm.migrate_issues()
+    mm.migrate_related_tickets()       # 
 
 
         

@@ -88,7 +88,7 @@ class GithubIssueMaker:
         return github_username
     
     
-    def update_github_issue(self, redmine_json_fname, redmine2github_issue_map):
+    def update_github_issue_with_related(self, redmine_json_fname, redmine2github_issue_map):
         """
         Update a GitHub issue with related tickets as specfied in Redmine
         
@@ -115,7 +115,7 @@ class GithubIssueMaker:
           "id": 4160,
         """
         if not os.path.isfile(redmine_json_fname):
-            msgx('ERROR.  update_github_issue. file not found: %s' % redmine_json_fname)
+            msgx('ERROR.  update_github_issue_with_related. file not found: %s' % redmine_json_fname)
         
         json_str = open(redmine_json_fname, 'r').read()
         rd = json.loads(json_str)       # The redmine issue as a python dict
@@ -133,7 +133,10 @@ class GithubIssueMaker:
             msg('Redmine issue not in nap')
             return
 
-        related_tickets = []
+
+        # Related tickets under 'relations'
+        #
+        github_related_tickets = []
         original_related_tickets = []
         for rel in rd.get('relations'):
             issue_to_id = rel.get('issue_to_id', None)
@@ -146,21 +149,61 @@ class GithubIssueMaker:
             related_github_issue_num = redmine2github_issue_map.get(str(issue_to_id), None)
             msg(related_github_issue_num)
             if related_github_issue_num:
-                related_tickets.append(related_github_issue_num)
-    
-
-        # Update github issue!!
-        if len(original_related_tickets) == 0:
-            return
+                github_related_tickets.append(related_github_issue_num)
+        github_related_tickets.sort()
+        original_related_tickets.sort()
+        #
+        # end: Related tickets under 'relations'
+        
+        
+        # Related tickets under 'children'
+        #
+        # "children": [{ "tracker": {"id": 2, "name": "Feature"    }, "id": 3454, "subject": "Icons in results and facet"    }, ...]
+        #
+        github_child_tickets = []
+        original_child_tickets = []
+        for ctick in rd.get('children', []):
             
-        original_issues_formatted = [ """[%s](%s)""" % (x, self.format_redmine_issue_link(x)) for x in original_related_tickets]
+            child_id = ctick.get('id', None)
+            if child_id is None:
+                continue
+                
+            original_child_tickets.append(child_id)
+            child_github_issue_num = redmine2github_issue_map.get(str(child_id), None)
+            
+            msg(child_github_issue_num)
+            if child_github_issue_num:
+                github_child_tickets.append(child_github_issue_num)
+        original_child_tickets.sort()
+        github_child_tickets.sort()
+        #
+        # end: Related tickets under 'children'
 
+
+        #
+        # Update github issue with related and child tickets
+        #
+        #
+        if len(original_related_tickets) == 0 and len(original_child_tickets)==0:
+            return
+        
+        # Format related ticket numbers
+        #
+        original_issues_formatted = [ """[%s](%s)""" % (x, self.format_redmine_issue_link(x)) for x in original_related_tickets]
         original_issues_str = ', '.join(original_issues_formatted)
         
-        related_issues_formatted = [ '#%d' % x for x in related_tickets]
+        related_issues_formatted = [ '#%d' % x for x in github_related_tickets]
         related_issue_str = ', '.join(related_issues_formatted)
         msg(related_issue_str)
         
+        
+        # Format children ticket numbers
+        #
+        original_children_formatted = [ """[%s](%s)""" % (x, self.format_redmine_issue_link(x)) for x in original_child_tickets]
+        original_children_str = ', '.join(original_children_formatted)
+
+        github_children_formatted = [ '#%d' % x for x in github_child_tickets]
+        github_children_str = ', '.join(github_children_formatted)
         
         try:
             issue = self.get_github_conn().issues.get(number=github_issue_num)
@@ -172,7 +215,11 @@ class GithubIssueMaker:
             
         template_params = { 'original_description' : issue.body\
                             , 'original_issues' : original_issues_str\
-                            , 'related_issues' : related_issue_str}
+                            , 'related_issues' : related_issue_str\
+                            , 'child_issues_original' : original_children_str\
+                            , 'child_issues_github' : github_children_str\
+                            
+                            }
 
         updated_description = template.render(template_params)
 
