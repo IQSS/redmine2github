@@ -3,7 +3,12 @@ import os
 from os.path import dirname, join, abspath, isdir
 import sys
 import json
-
+import urllib2
+try:
+    from urlparse import urljoin
+except:
+    from urllib.parse import urljoin        # python 3.x
+    
 # http://python-redmine.readthedocs.org/
 from redmine import Redmine
 
@@ -33,7 +38,7 @@ class RedmineIssueDownloader:
     #
     ZERO_PADDING_LEVEL = 5
     
-    def __init__(self, redmine_server, redmine_api_key, project_name_or_identifier, issues_base_directory):
+    def __init__(self, redmine_server, redmine_api_key, project_name_or_identifier, issues_base_directory, **kwargs):
         """
         Constructor
         
@@ -46,9 +51,8 @@ class RedmineIssueDownloader:
         self.redmine_api_key = redmine_api_key
         self.project_name_or_identifier = project_name_or_identifier
         self.issues_base_directory = issues_base_directory
+        self.issue_status = kwargs.get('issue_status', '*') # values 'open', 'closed', '*'
         
-        #self.num_issues = num_issues
-
         self.redmine_conn = None
         self.redmine_project = None
         
@@ -69,6 +73,22 @@ class RedmineIssueDownloader:
         self.redmine_project = self.redmine_conn.project.get(self.project_name_or_identifier)
         msg('Connected to server [%s] project [%s]' % (self.redmine_server, self.project_name_or_identifier))
 
+
+    def get_issue_count(self):
+        msgt('get_issue_count')
+        issue_query_str = 'issues.json?project_id=%s&limit=1&status_id=%s' % (self.project_name_or_identifier, self.issue_status)
+        url = urljoin(self.redmine_server, issue_query_str)
+        print (self.redmine_server)
+        msg('Issue count url: %s' % url)
+        content = urllib2.urlopen(url)
+        data = json.load(content)
+        
+        if not data.has_key('total_count'):
+            msgx('Total count not found in data: \n[%s]' % data)
+
+        return data['total_count']
+
+
     def write_issue_list(self, issue_fname, issue_dict):
         if issue_fname is None or not type(issue_dict) == dict:
             msgx('ERROR: write_issue_list, issue_fname is None or issue_dict not dict')
@@ -84,36 +104,44 @@ class RedmineIssueDownloader:
     
     def download_tickets2(self):
         """
-        Doesn't work b/c "total_count" not available
+        fyi: Retrieving total count via regular api, not python redmine package
         """
-        pass
         issue_dict = {}
         issue_fname = join(self.issue_dirname, 'issue_list.json') 
         msg('Gathering issue information.... (may take a minute)')
 
-        ticket_cnt = self.redmine_project.total_count       # not available w/o iterating through issues.....
+        ticket_cnt = self.get_issue_count()      
         
-        num_loops = self.num_issues / record_retrieval_size
-        extra_recs = self.num_issues % record_retrieval_size
+        RECORD_RETRIEVAL_SIZE = 100
         
+        num_loops = ticket_cnt / RECORD_RETRIEVAL_SIZE
+        extra_recs = ticket_cnt % RECORD_RETRIEVAL_SIZE
+        if extra_recs > 0:
+            num_loops+=1
+        #num_loops=3
         msg('num_loops: %d' % num_loops)
         msg('extra_recs: %d' % extra_recs)
         
         cnt = 0
         for loop_num in range(0, num_loops):
-            start_record = loop_num * record_retrieval_size
-            end_record = (loop_num+1) * record_retrieval_size
+            start_record = loop_num * RECORD_RETRIEVAL_SIZE
+            end_record = (loop_num+1) * RECORD_RETRIEVAL_SIZE
             
-            msgt('Retrieve records: %s - %s' % (start_record, end_record))
+            msgt('Retrieve records via idx (skip last): %s - %s' % (start_record, end_record))
             
-            for item in self.redmine_project.issues[start_record:end_record]:
+            # limit of 100 is returning 125
+            rec_cnt = 0
+            for item in self.redmine_conn.issue.filter(project_id=self.project_name_or_identifier, status_id=self.issue_status, sort='id', offset=start_record)[:RECORD_RETRIEVAL_SIZE]: #, limit=RECORD_RETRIEVAL_SIZE):   #[start_record:end_record]
+                rec_cnt +=1
                 cnt +=1
-                msg('%s - %s' % (item.id, item.subject))
-                if cnt >= save_at_count:
+                msg('(%s) %s - %s' % (rec_cnt, item.id, item.subject))
+                if item.id in [1828, 2963, 3099, 3397, 3432]: #or (item.id >= 3432):
+                    self.save_single_issue(item)                    
                     issue_dict[self.pad_issue_id(item.id)] = item.subject
-                    self.save_single_issue(item)
-                else:
-                    msg('--skipped save--')
+                if rec_cnt == RECORD_RETRIEVAL_SIZE:
+                    break
+                continue
+                #self.save_single_issue(item)
             self.write_issue_list(issue_fname, issue_dict)
         
        
@@ -135,7 +163,7 @@ class RedmineIssueDownloader:
         msg('Gathering issue information.... (may take a minute)')
         cnt = 0
         
-        for item in self.redmine_conn.issue.all(sort='id'):
+        for item in self.redmine_conn.issue.filter(project_id=self.project_name_or_identifier, status_id=self.issue_status, sort='id'):
             cnt +=1
             dashes()
             msg('(cnt:%s) \nDownload issue id [%s] \nSubject [%s]' % (cnt, item.id, item.subject))
@@ -230,7 +258,8 @@ if __name__=='__main__':
     from settings.base import REDMINE_SERVER, REDMINE_API_KEY, REDMINE_ISSUES_DIRECTORY
     #rn = RedmineIssueDownloader(REDMINE_SERVER, REDMINE_API_KEY, 'dvn', REDMINE_ISSUES_DIRECTORY)
     rn = RedmineIssueDownloader(REDMINE_SERVER, REDMINE_API_KEY, 1, REDMINE_ISSUES_DIRECTORY)
-    rn.download_tickets()
+    rn.download_tickets2()
+    msg(rn.get_issue_count())
     #rn.show_project_info()
     #rn.process_files()
     #msg(rn.get_single_issue(4156))

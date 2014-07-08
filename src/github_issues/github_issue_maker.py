@@ -28,6 +28,7 @@ class GithubIssueMaker:
     Given a Redmine issue in JSON format, create a GitHub issue.
     These issues should be moved from Redmine in order of issue.id.  This will allow mapping of Redmine issue ID's against newly created Github issued IDs.  e.g., can translate related issues numbers, etc.
     """
+    ISSUE_STATE_CLOSED = 'closed'
     
     def __init__(self, user_map_helper=None, label_mapping_filename=None, milestone_mapping_filename=None):        
         self.github_conn = None
@@ -186,7 +187,37 @@ class GithubIssueMaker:
             
         return os.path.join(REDMINE_SERVER, 'issues', '%d' % issue_id) 
         
+    
+    def close_github_issue(self, github_issue_num):
+    
+        if not github_issue_num:
+            return False
+        msgt('Close issue: %s' % github_issue_num)
         
+        try:
+             issue = self.get_github_conn().issues.get(number=github_issue_num)
+        except pygithub3.exceptions.NotFound:
+             msg('Issue not found!')
+             return False
+        
+        if issue.state == self.ISSUE_STATE_CLOSED:
+            msg('Already closed')
+            return True
+            
+        updated_issue = self.get_github_conn().issues.update(number=github_issue_num, data={'state': self.ISSUE_STATE_CLOSED })
+        if not updated_issue:
+            msg('Failed to close issue')
+            return False
+        
+        if updated_issue.state == self.ISSUE_STATE_CLOSED:
+            msg('Issue closed')
+            return True
+            
+        msg('Failed to close issue')
+        return False
+        
+    
+    
     def make_github_issue(self, redmine_json_fname, **kwargs):
         """
         Create a GitHub issue from JSON for a Redmine issue.
@@ -255,6 +286,7 @@ class GithubIssueMaker:
         msg('issue id: %s' % issue_obj.id)
         msg('issue url: %s' % issue_obj.html_url)
         
+        
         # Map the new github Issue number to the redmine issue number
         #
         #redmine2github_id_map.update({ rd.get('id', 'unknown') : issue_obj.number })
@@ -269,10 +301,37 @@ class GithubIssueMaker:
             if journals:
                 self.add_comments_for_issue(issue_obj.number, journals)
 
+
+        #
+        #   (5) Should this issue be closed?
+        #
+        if self.is_redmine_issue_closed(rd):
+            self.close_github_issue(issue_obj.number)
+
         return issue_obj.number
 
 
-
+    def is_redmine_issue_closed(self, redmine_issue_dict):
+        """
+        "status": {
+            "id": 5, 
+            "name": "Completed"
+        },
+        """
+        if not type(redmine_issue_dict) == dict:
+            return False
+            
+        status_info = redmine_issue_dict.get('status', None)
+        if not status_info:
+            return False
+            
+        if status_info.has_key('id') and status_info.get('id', None) == 5:
+            return True
+        
+        return False
+            
+            
+            
     def add_comments_for_issue(self, issue_num, journals):
         """
         Add comments
@@ -319,7 +378,9 @@ if __name__=='__main__':
     
     issue_filename = '/Users/rmp553/Documents/iqss-git/redmine2github/working_files/redmine_issues/2014-0702/04156.json'
     gm = GithubIssueMaker()
-    gm.make_github_issue(issue_filename, {})
+    for x in range(100, 170):
+        gm.close_github_issue(x)
+    #gm.make_github_issue(issue_filename, {})
     
     sys.exit(0)
     root_dir = '/Users/rmp553/Documents/iqss-git/redmine2github/working_files/redmine_issues/2014-0702/'
