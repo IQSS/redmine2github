@@ -202,25 +202,25 @@ class MigrationManager:
                 self.save_dict_to_file(mapping_dict)
         
             if issue_cnt % 50 == 0:
-                msgt('sleep 2 seconds....')
-                time.sleep(2)
+                msgt('sleep 1 seconds....')
+                time.sleep(1)
 
 if __name__=='__main__':
-    json_input_directory = os.path.join(REDMINE_ISSUES_DIRECTORY, '2014-0708')
+    json_input_directory = os.path.join(REDMINE_ISSUES_DIRECTORY, '2014-0709')
 
     kwargs = dict(include_comments=True\
-                , include_assignee=False\
-                , redmine_issue_start_number=3430\
-                , redmine_issue_end_number=3430\
-                #, user_mapping_filename=USER_MAP_FILE       # optional
+                , include_assignee=True\
+                , redmine_issue_start_number=3583\
+                , redmine_issue_end_number=9999\
+                , user_mapping_filename=USER_MAP_FILE       # optional
                 , label_mapping_filename=LABEL_MAP_FILE     # optional
                 , milestone_mapping_filename=MILESTONE_MAP_FILE # optional
             )
     mm = MigrationManager(json_input_directory\
                             , REDMINE_TO_GITHUB_MAP_FILE\
                             , **kwargs)
-    #mm.migrate_issues()
-    mm.migrate_related_tickets()       # 
+    mm.migrate_issues()
+    #mm.migrate_related_tickets()       
 
 
         

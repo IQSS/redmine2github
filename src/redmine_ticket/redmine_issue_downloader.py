@@ -135,7 +135,7 @@ class RedmineIssueDownloader:
                 rec_cnt +=1
                 cnt +=1
                 msg('(%s) %s - %s' % (rec_cnt, item.id, item.subject))
-                if item.id in [1828, 2963, 3099, 3397, 3432]: #or (item.id >= 3432):
+                if item.id in [1828, 2963, 3099, 3397] or (item.id >= 3432):
                     self.save_single_issue(item)                    
                     issue_dict[self.pad_issue_id(item.id)] = item.subject
                 if rec_cnt == RECORD_RETRIEVAL_SIZE:

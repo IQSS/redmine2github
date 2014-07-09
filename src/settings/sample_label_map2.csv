@@ -1,0 +1,25 @@
+redmine_type,  redmine_name,  github_label_name,  github_label_color
+status,  New,  Status 1: Design,  FFCC00
+status,  In Review,  Status 1: Design,  FFCC00
+status,  In Design,  Status 1: Design, FFCC00
+status,  In Dev,  Status 2: Dev, CCCC00
+status,  In Code Review,  Status 3: QA, 99CC00
+status,  In QA,  Status 3: QA, 99CC00
+priority,  Low,  Priority 3: Medium,  FFFF00
+priority,  Normal,  Priority 3: Medium,  FFFF00
+priority,  High,  Priority 2: High,  FF9900
+priority,  Urgent,  Priority 2: High,  FF9900
+priority,  Immediate,  Priority 2: High,  FF9900
+priority,  Blank,  Priority 1: Critical,  FF3300
+tracker,  Bug,  Type 1: Bug,  fc2929
+tracker,  Feature,  Type 2: Feature,  84b6eb
+tracker,  Suggestion,  Type 3: Suggestion,  CCFF00
+tracker,  Support,  Type 2: Feature,  84b6eb
+tracker,  Documentation, Type 2: Feature, 84b6eb
+Component,  API,  Component: API,  00CC99
+Component,  File Upload & Handling,  Component: File Upload & Handling,  009999
+Component,  high-level,  Component: High-level,  006699
+Component,  Metadata,  Component: Metadata,  003399
+Component,  Migration,  Component: Migration,  000099
+Component,  Search/Browse,  Component: Search/Browse, 3300CC
+Component,  UX & Component Upgrade,  Component: UX & Component Upgrade,  6600FF

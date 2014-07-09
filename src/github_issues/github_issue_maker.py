@@ -66,6 +66,26 @@ class GithubIssueMaker:
         return author_name
         
     
+    def get_redmine_assignee_name(self, redmine_issue_dict):
+        """
+        If a redmine user has a github account mapped, add the person as the assignee
+        
+        "assigned_to": {
+            "id": 4, 
+            "name": "Philip Durbin"
+        },
+        /cc @kneath @jresig
+        """
+        if not type(redmine_issue_dict) is dict:
+            return None
+    
+        redmine_name = redmine_issue_dict.get('assigned_to', {}).get('name', None)
+        if redmine_name is None:
+            return None
+        
+        return redmine_name
+
+        
     def get_assignee(self, redmine_issue_dict):
         """
         If a redmine user has a github account mapped, add the person as the assignee
@@ -162,20 +182,23 @@ class GithubIssueMaker:
         #
         github_child_tickets = []
         original_child_tickets = []
-        for ctick in rd.get('children', []):
+        
+        child_ticket_info = rd.get('children', [])
+        if child_ticket_info:
+            for ctick in child_ticket_info:
             
-            child_id = ctick.get('id', None)
-            if child_id is None:
-                continue
+                child_id = ctick.get('id', None)
+                if child_id is None:
+                    continue
                 
-            original_child_tickets.append(child_id)
-            child_github_issue_num = redmine2github_issue_map.get(str(child_id), None)
+                original_child_tickets.append(child_id)
+                child_github_issue_num = redmine2github_issue_map.get(str(child_id), None)
             
-            msg(child_github_issue_num)
-            if child_github_issue_num:
-                github_child_tickets.append(child_github_issue_num)
-        original_child_tickets.sort()
-        github_child_tickets.sort()
+                msg(child_github_issue_num)
+                if child_github_issue_num:
+                    github_child_tickets.append(child_github_issue_num)
+            original_child_tickets.sort()
+            github_child_tickets.sort()
         #
         # end: Related tickets under 'children'
 
@@ -194,7 +217,8 @@ class GithubIssueMaker:
         
         related_issues_formatted = [ '#%d' % x for x in github_related_tickets]
         related_issue_str = ', '.join(related_issues_formatted)
-        msg(related_issue_str)
+        msg('Redmine related issues: %s' % original_issues_str)
+        msg('Github related issues: %s' % related_issue_str)
         
         
         # Format children ticket numbers
@@ -204,6 +228,8 @@ class GithubIssueMaker:
 
         github_children_formatted = [ '#%d' % x for x in github_child_tickets]
         github_children_str = ', '.join(github_children_formatted)
+        msg('Redmine sub-issues: %s' % original_children_str)
+        msg('Github sub-issues: %s' % github_children_str)
         
         try:
             issue = self.get_github_conn().issues.get(number=github_issue_num)
@@ -225,7 +251,7 @@ class GithubIssueMaker:
 
         issue = self.get_github_conn().issues.update(number=github_issue_num, data={'body':updated_description})
         
-        msg('Issue updated: %s' % issue.body)
+        msg('Issue updated!')#' % issue.body)
         
         
     def format_redmine_issue_link(self, issue_id):
@@ -299,6 +325,7 @@ class GithubIssueMaker:
                     , 'start_date' : rd.get('start_date', None)\
                     , 'author_name' : author_name\
                     , 'author_github_username' : author_github_username\
+                    , 'redmine_assignee' : self.get_redmine_assignee_name(rd)
         }
         
         description_info = template.render(desc_dict)
