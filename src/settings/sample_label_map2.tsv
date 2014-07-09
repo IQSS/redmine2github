@@ -1,20 +1,20 @@
 redmine_type	 redmine_name	 github_label_name	 github_label_color
 status	 New	 Status 1: Design	 FF6600
-status	 In Review	 Status 1: Design	 CC6600
-status	 In Design	 Status 1: Design	996600
+status	 In Review	 Status 1: Design	 FF6600
+status	 In Design	 Status 1: Design	FF6600
 status	 In Dev	 Status 2: Dev	996600
 status	 In Code Review	 Status 3: QA	666600
-status	 In QA	 Status 3: QA	009933
+status	 In QA	 Status 3: QA	666600
 priority	 Low	 Priority 3: Medium	 009933
-priority	 Normal	 Priority 3: Medium	 666600
+priority	 Normal	 Priority 3: Medium	 009933
 priority	 High	 Priority 2: High	 996600
-priority	 Urgent	 Priority 2: High	 FF6600
-priority	 Immediate	 Priority 2: High	 FF0000
+priority	 Urgent	 Priority 2: High	 996600
+priority	 Immediate	 Priority 2: High	 996600
 tracker	 Bug	 Type 1: Bug	 FF0000
 tracker	 Feature	 Type 2: Feature	 FF6600
 tracker	 Suggestion	 Type 3: Suggestion	 996600
-tracker	 Support	 Type 2: Feature	 666600
-tracker	 Documentation	Type 2: Feature	009933
+tracker	 Support	 Type 2: Feature	 FF6600
+tracker	 Documentation	Type 2: Feature	FF6600
 Component	 API	 Component: API	 00CC99
 Component	 File Upload & Handling	 Component: File Upload & Handling	 009999
 Component	 high-level	 Component: High-level	 006699
