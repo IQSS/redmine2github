@@ -17,8 +17,8 @@ from utils.msg_util import *
 from github_issues.md_translate import translate_for_github
 
 
-#from settings.base import GITHUB_LOGIN, GITHUB_PASSWORD, GITHUB_TARGET_REPOSITORY, GITHUB_TARGET_USERNAME
-from settings.base import get_github_auth   #GITHUB_LOGIN, GITHUB_PASSWORD, GITHUB_TARGET_REPOSITORY, GITHUB_TARGET_USERNAME
+#from settings.base import GITHUB_LOGIN, GITHUB_PASSWORD_OR_PERSONAL_ACCESS_TOKEN, GITHUB_TARGET_REPOSITORY, GITHUB_TARGET_USERNAME
+from settings.base import get_github_auth   #GITHUB_LOGIN, GITHUB_PASSWORD_OR_PERSONAL_ACCESS_TOKEN, GITHUB_TARGET_REPOSITORY, GITHUB_TARGET_USERNAME
 from settings.base import REDMINE_SERVER#, REDMINE_API_KEY, REDMINE_ISSUES_DIRECTORY
 
 import pygithub3
@@ -92,7 +92,7 @@ class MilestoneHelper:
     def get_github_conn(self):
 
         if self.github_conn is None:
-            #auth = dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)
+            #auth = dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD_OR_PERSONAL_ACCESS_TOKEN, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)
             self.github_conn = pygithub3.Github(**get_github_auth())
         return self.github_conn
         

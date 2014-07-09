@@ -442,7 +442,7 @@ class GithubIssueMaker:
 
 
 if __name__=='__main__':
-    #auth = dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)
+    #auth = dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD_OR_PERSONAL_ACCESS_TOKEN, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)
     #milestone_service = pygithub3.services.issues.Milestones(**auth)
     #comments_service = pygithub3.services.issues.Comments(**auth)
     #fname = 03385.json'

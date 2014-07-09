@@ -7,7 +7,7 @@ if __name__=='__main__':
 
 import requests
 from utils.msg_util import *
-from settings.base import GITHUB_LOGIN, GITHUB_PASSWORD, GITHUB_TARGET_USERNAME, GITHUB_TARGET_REPOSITORY
+from settings.base import GITHUB_LOGIN, GITHUB_PASSWORD_OR_PERSONAL_ACCESS_TOKEN, GITHUB_TARGET_USERNAME, GITHUB_TARGET_REPOSITORY
 import json
 from github_issues.label_map import LabelMap
 
@@ -16,7 +16,7 @@ class LabelHelper:
     
     def __init__(self, label_map_filename=None):
         """The add label to issue seems broken in pygithub3, just use this for now"""
-        self.auth = (GITHUB_LOGIN, GITHUB_PASSWORD)
+        self.auth = (GITHUB_LOGIN, GITHUB_PASSWORD_OR_PERSONAL_ACCESS_TOKEN)
         
         self.label_map_filename = label_map_filename
         self.label_map = None
@@ -235,7 +235,7 @@ class LabelHelper:
             
 """
 #labels_service = pygithub3.services.issues.Labels(**auth)
-#auth = dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD)
+#auth = dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD_OR_PERSONAL_ACCESS_TOKEN)
 
 #pygithub3.services.issues.Labels
 

@@ -16,7 +16,7 @@ REDMINE_API_KEY = 'my-api-key from remdine account page'
 
 GITHUB_SERVER = 'https://api.github.com'
 GITHUB_LOGIN = 'github username'
-GITHUB_PASSWORD = getpass.getpass('Enter github pw:')
+GITHUB_PASSWORD_OR_PERSONAL_ACCESS_TOKEN = getpass.getpass('Enter github pw:')
 
 GITHUB_TARGET_REPOSITORY = 'test-issue-migrate'
 GITHUB_TARGET_USERNAME = 'target-repo-github-username'
@@ -43,4 +43,4 @@ LABEL_MAP_FILE = join(WORKING_FILES_DIRECTORY, 'redmine2github_label_map.csv')
 MILESTONE_MAP_FILE = join(WORKING_FILES_DIRECTORY, 'redmine2github_milestone_map.csv')
 
 def get_github_auth():
-   return dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)
+   return dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD_OR_PERSONAL_ACCESS_TOKEN, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)

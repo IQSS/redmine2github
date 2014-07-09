@@ -24,8 +24,12 @@ Scripts to migrate redmine tickets to github issues.  This is for a 1-time move-
         * e.g. Issue 387 becomes "00387.json"
     * Files are saved to the following directory:
         * from settings/local.py:  (REDMINE_ISSUES_DIRECTORY)/(current date in 'YYYY_MMDD' format)
+            * e.g. ../working_files/redmine_issues/2014-0709/(json files here)
+                   ../working_files/redmine_issues/2014-0709/03982.json
+                   ../working_files/redmine_issues/2014-0709/04050.json
 * A json dict is saved to "issues_list.json" that maps the redmine issue number to the issue subject.  For example:
-
+            * e.g. ../working_files/redmine_issues/2014-0709/issues_list.json
+            
 ```javascript
     {
         "03982": "Create Genomics Metadata Block", 
@@ -35,9 +39,8 @@ Scripts to migrate redmine tickets to github issues.  This is for a 1-time move-
     }
     
 ```
-* Currently inefficient, but ok for not/for this job (rp)
 
-#### Quick script
+#### Example of downloading redmine issues
 
 + cd into the src/redmine_ticket directory
 + update the bottom of the "redmine_issue_downloader.py" file
@@ -78,7 +81,7 @@ Note 2: The current [GitHub API limit](https://developer.github.com/v3/rate_limi
 + 0-n API Calls for comments: A single API call is used to transfer each comment
 + 2 API Calls for related issues (optional): After all issues are moved
     + Call 1: Read each GitHub issue
-    + At the bottom of the description, use the Redmine->GitHub issue number mapping to add related issue numbers
+    + At the bottom of the description, use the Redmine->GitHub issue number mapping to add related issue numbers and child issue numbers
     + Call 2: Update the GitHub description
 
 
@@ -103,6 +106,9 @@ if __name__=='__main__':
                 , milestone_mapping_filename=MILESTONE_MAP_FILE # optional
             )
     mm = MigrationManager(json_input_directory, **kwargs)
+    # e.g. json_input_directory, where you downloaded the redmine JSON
+    #      json_input_directory="some_dir/working_files/redmine_issues/2014-0709/" 
+    #
     mm.migrate_issues()
 ```
 

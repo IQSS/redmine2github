@@ -210,7 +210,7 @@ if __name__=='__main__':
 
     kwargs = dict(include_comments=True\
                 , include_assignee=True\
-                , redmine_issue_start_number=3583\
+                , redmine_issue_start_number=0\
                 , redmine_issue_end_number=9999\
                 , user_mapping_filename=USER_MAP_FILE       # optional
                 , label_mapping_filename=LABEL_MAP_FILE     # optional
@@ -219,7 +219,7 @@ if __name__=='__main__':
     mm = MigrationManager(json_input_directory\
                             , REDMINE_TO_GITHUB_MAP_FILE\
                             , **kwargs)
-    mm.migrate_issues()
+    #mm.migrate_issues()
     #mm.migrate_related_tickets()       
 
 
