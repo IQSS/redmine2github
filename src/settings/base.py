@@ -45,5 +45,16 @@ LABEL_MAP_FILE = config.LABEL_MAP_FILE
 #   example, see settings/sample_milestone_map.csv
 MILESTONE_MAP_FILE = config.MILESTONE_MAP_FILE
 
+
+def get_gethub_issue_url(issue_id=None):
+    """
+    Used by the "redmine_issue_updater" to add links back to the original redmine tickets
+    """
+    issue_url = 'https://github.com/%s/%s/issues' % (GITHUB_TARGET_USERNAME, GITHUB_TARGET_REPOSITORY)
+    
+    if issue_id:
+        return '%s/%s' % (issue_url, issue_id)
+    return issue_url
+
 def get_github_auth():
    return dict(login=GITHUB_LOGIN, password=GITHUB_PASSWORD_OR_PERSONAL_ACCESS_TOKEN, repo=GITHUB_TARGET_REPOSITORY, user=GITHUB_TARGET_USERNAME)
