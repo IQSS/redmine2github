@@ -37,7 +37,7 @@ The [add_update_labels.py](https://github.com/IQSS/redmine2github/blob/master/sc
 1.  Fill in the "MANDATORY VARIABLES" at the top.
 1.  Create a issue map similar to ["sample_label_input.txt"](https://github.com/IQSS/redmine2github/blob/master/scripts/label_updates/sample_label_input.txt)
 1.  Run the script against the file:
-2.  
+
 ```python
 >python add_update_labels.py sample_label_input.txt
 ```
