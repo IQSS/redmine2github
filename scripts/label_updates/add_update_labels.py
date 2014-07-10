@@ -75,7 +75,8 @@ def add_labels(label_fname):
             msg('Label failed!')
         msg(r.text)
 
-        
+
+
 def show_instructions():
     dashes()
     msg("""Please run this script from the command line as follows:
