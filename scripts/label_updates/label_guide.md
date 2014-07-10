@@ -5,7 +5,7 @@ The Label Name/Color table below shows the label names and colors for:
 * Priority
 * Status
 * Type
-* Components
+* Components - Add specific component names for your file
  
 [See label colors in Dataverse](https://github.com/IQSS/dataverse/issues/new)
 
@@ -30,3 +30,6 @@ Notes:
 + All Types have the same color
 + All Components have the same color
 
+### Scripting in your labels
+
+The add_update_labels.py script in this directory may be used to script in your labels via the GitHub API.
