@@ -16,4 +16,4 @@ Notes:
 + All Types have the same color
 + All Components have the same color
 
-[Label examples in Dataverse](https://github.com/IQSS/dataverse/issues/new)
+[See label colors in Dataverse](https://github.com/IQSS/dataverse/issues/new)
