@@ -1,3 +1,17 @@
+## Label Guide / Colors
+
+The Label Name/Color table below shows the label names and colors for:
+
+* Priority
+* Status
+* Type
+* Components
+ 
+[See label colors in Dataverse](https://github.com/IQSS/dataverse/issues/new)
+
+### Label Name/Color table
+
+
 |Label Name|Label Color|
 |------------|------------|
 |Priority: Critical|ff9900|
@@ -16,4 +30,3 @@ Notes:
 + All Types have the same color
 + All Components have the same color
 
-[See label colors in Dataverse](https://github.com/IQSS/dataverse/issues/new)
