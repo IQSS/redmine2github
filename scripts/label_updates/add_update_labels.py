@@ -8,14 +8,14 @@ def msgt(s): dashes(); msg(s); dashes()
 def msgx(s): msgt('Error.  Exiting'); msg(s); dashes(); sys.exit(0)
 
 
-# FILL IN THE FOLLOWING MANDATORY VARIABLES
+## FILL IN THE FOLLOWING MANDATORY VARIABLES
 REPO_NAME = 'github repository name'
 REPO_OWNER_NAME = 'github repository owner name'
 
 GITHUB_AUTH_USERNAME = 'github-username'
 # For A GitHub personal access token: https://github.com/settings/applications#personal-access-tokens
 GITHUB_AUTH_TOKEN_OR_PASSWORD = ''  
-######## end: neeeded MANDATORY VARIABLES
+## end: neeeded MANDATORY VARIABLES
 
 
 def add_labels(label_fname):
