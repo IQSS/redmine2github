@@ -7,9 +7,10 @@ The Label Name/Color table below shows the label names and colors for:
 * Type
 * Components - Add specific component names for your file
  
-[See label colors in Dataverse](https://github.com/IQSS/dataverse/issues/new)
 
 ### Label Name/Color table
+
++ [See label colors in Dataverse](https://github.com/IQSS/dataverse/issues/new)
 
 
 |Label Name|Label Color|
