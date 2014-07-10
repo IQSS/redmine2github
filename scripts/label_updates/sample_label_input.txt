@@ -1,0 +1,16 @@
+#Component: API|c7def8
+#Component: File Upload & Handling|c7def8
+#Component: High-level|c7def8
+#Component: Metadata|c7def8
+#Component: Migration|c7def8
+#Component: Search/Browse|c7def8
+Component: Basic Component Color|c7def8
+Priority: Critical|ff9900
+Priority: High|e11d21
+Priority: Medium|cc6666
+Status: Design|66ff66
+Status: Dev|66cc66
+Status: QA|336633
+Type: Bug|fef2c0
+Type: Feature|fef2c0
+Type: Suggestion|fef2c0

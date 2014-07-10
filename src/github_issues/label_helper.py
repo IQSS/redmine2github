@@ -232,6 +232,11 @@ class LabelHelper:
                     label_names.append(component_label_name)
 
         return label_names
+        
+if __name__=='__main__':
+    from settings.base import LABEL_MAP_FILE
+    LabelHelper(LABEL_MAP_FILE)     # load a new label color map
+    
             
 """
 #labels_service = pygithub3.services.issues.Labels(**auth)
