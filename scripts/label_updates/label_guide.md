@@ -2,6 +2,7 @@
 |------------|------------|
 |Component: (Component 1)|c7def8|
 |Component: (Component 2, etc)|c7def8|
+|------------|------------|
 |Priority: Critical|ff9900|
 |Priority: High|e11d21|
 |Priority: Medium|cc6666|
