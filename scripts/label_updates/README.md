@@ -33,7 +33,7 @@ The Label Name/Color table below shows the label names and colors for:
 
 ### Label Name/Color table
 
-+ [See label colors in Dataverse](https://github.com/IQSS/dataverse/issues/new)
++ [See label colors in Dataverse](https://github.com/IQSS/dataverse/labels)
 
 
 |Label Name|Label Color|
