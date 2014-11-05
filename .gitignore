@@ -1,5 +1,5 @@
 scripts/label_updates/add_labels.py
-
+src/settings/local_geoconnect.*
 test_files/*
 src/settings/local.py
 working_files/*

@@ -52,6 +52,8 @@ class LabelHelper:
             msg('  (1) Try to retrieve label')            
             label_url = 'https://api.github.com/repos/%s/%s/labels/%s' % (GITHUB_TARGET_USERNAME, GITHUB_TARGET_REPOSITORY, label_info.github_label_name)
             req = requests.get(label_url, auth=self.auth)
+            msg('url: %s' % label_url)
+            msg('status: %s' % req.status_code)
             
             #  (2) Label exists
             if req.status_code == 200:

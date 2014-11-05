@@ -46,12 +46,15 @@ class RedmineIssueDownloader:
         :param redmine_api_key: str with a redmine api key
         :param project_name_or_identifier: str or int with either the redmine project id or project identifier
         :param issues_base_directory: str, directory to download the redmine issues in JSON format.  Directory will be crated
+        :param specific_tickets_to_download: optional, list of specific ticket numbers to download. e.g. [2215, 2216, etc]
         """
         self.redmine_server = redmine_server
         self.redmine_api_key = redmine_api_key
         self.project_name_or_identifier = project_name_or_identifier
         self.issues_base_directory = issues_base_directory
         self.issue_status = kwargs.get('issue_status', '*') # values 'open', 'closed', '*'
+        
+        self.specific_tickets_to_download = kwargs.get('specific_tickets_to_download', None)
         
         self.redmine_conn = None
         self.redmine_project = None
@@ -135,46 +138,26 @@ class RedmineIssueDownloader:
                 rec_cnt +=1
                 cnt +=1
                 msg('(%s) %s - %s' % (rec_cnt, item.id, item.subject))
-                if item.id in [1828, 2963, 3099, 3397] or (item.id >= 3432):
+                
+                if self.specific_tickets_to_download is not None:
+                    # only download specific tickets
+                    #
+                    if item.id in self.specific_tickets_to_download:
+                        self.save_single_issue(item)                    
+                        issue_dict[self.pad_issue_id(item.id)] = item.subject
+                    continue    # go to next item
+                else:
+                    # Get all tickets                
+                    #
                     self.save_single_issue(item)                    
                     issue_dict[self.pad_issue_id(item.id)] = item.subject
                 if rec_cnt == RECORD_RETRIEVAL_SIZE:
                     break
-                continue
+                #continue
                 #self.save_single_issue(item)
             self.write_issue_list(issue_fname, issue_dict)
         
-       
-
-    def download_tickets(self, save_at_count=1):
-        """
-        Download the Redmine tickets and save as individual JSON files.  
-        These files are saved to a directory with the naming convention: 
-           
-            issues_base_directory (from constructor) + YYYY-MMDD
-        
-        To change the time string format, modify this class's TIME_FORMAT_STRING
-        
-        :param save_at_count: optional int, start saving the tickets at this ticket count.  The count is specific to this program.  e.g. The print command will show (cnt:1), (cnt:2), etc.  If you want to start saving files at a specific count, then use this parameter.  May be useful if restarting program, etc.
-        
-        """
-        issue_dict = {}
-        issue_fname = join(self.issue_dirname, 'issue_list.json') 
-        msg('Gathering issue information.... (may take a minute)')
-        cnt = 0
-        
-        for item in self.redmine_conn.issue.filter(project_id=self.project_name_or_identifier, status_id=self.issue_status, sort='id'):
-            cnt +=1
-            dashes()
-            msg('(cnt:%s) \nDownload issue id [%s] \nSubject [%s]' % (cnt, item.id, item.subject))
-            if cnt >= save_at_count:
-                issue_dict[self.pad_issue_id(item.id)] = item.subject
-                self.save_single_issue(item)
-            else:
-                msg('(skip save)')
-                
-        self.write_issue_list(issue_fname, issue_dict)
-
+ 
     def pad_issue_id(self, issue_id):
         if issue_id is None:
             msgx('ERROR. pad_issue_id. The "issue_id" is None')
@@ -257,12 +240,13 @@ class RedmineIssueDownloader:
 if __name__=='__main__':
     from settings.base import REDMINE_SERVER, REDMINE_API_KEY, REDMINE_ISSUES_DIRECTORY
     #rn = RedmineIssueDownloader(REDMINE_SERVER, REDMINE_API_KEY, 'dvn', REDMINE_ISSUES_DIRECTORY)
-    rn = RedmineIssueDownloader(REDMINE_SERVER, REDMINE_API_KEY, 1, REDMINE_ISSUES_DIRECTORY)
+    kwargs = dict(specific_tickets_to_download=[1371, 1399, 1843, 2214, 2215, 2216, 3362, 3387, 3397, 3400, 3232, 3271, 3305, 3426, 3425, 3313, 3208])
+    rn = RedmineIssueDownloader(REDMINE_SERVER, REDMINE_API_KEY, 1, REDMINE_ISSUES_DIRECTORY, **kwargs)
     rn.download_tickets2()
     msg(rn.get_issue_count())
     #rn.show_project_info()
     #rn.process_files()
-    #msg(rn.get_single_issue(4156))
+    #msg(rn.get_single_issue(3232))
     
 """
 import json

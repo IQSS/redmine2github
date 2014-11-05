@@ -136,7 +136,7 @@ class MigrationManager:
             # Start processing at or after redmine_issue_START_number
             if not redmine_issue_num >= self.redmine_issue_start_number:
                 msg('Skipping Redmine issue: %s (start at %s)' % (redmine_issue_num, self.redmine_issue_start_number ))
-                continue        # skip tAttempt to create issue
+                continue        # skip Attempt to create issue
                 # his
             
             # Don't process after the redmine_issue_END_number
@@ -148,6 +148,7 @@ class MigrationManager:
             issue_cnt += 1
 
             msgt('(%s) Loading redmine issue: [%s] from file [%s]' % (issue_cnt, redmine_issue_num, json_fname))
+            
             json_fname_fullpath = os.path.join(self.redmine_json_directory, json_fname)
         
             gm.update_github_issue_with_related(json_fname_fullpath, redmine2github_issue_map)
@@ -206,12 +207,12 @@ class MigrationManager:
                 time.sleep(1)
 
 if __name__=='__main__':
-    json_input_directory = os.path.join(REDMINE_ISSUES_DIRECTORY, '2014-0709')
+    json_input_directory = os.path.join(REDMINE_ISSUES_DIRECTORY, '2014-0902')
 
     kwargs = dict(include_comments=True\
                 , include_assignee=True\
-                , redmine_issue_start_number=9999\
-                , redmine_issue_end_number=9999\
+                , redmine_issue_start_number=0\
+                , redmine_issue_end_number=3500\
                 , user_mapping_filename=USER_MAP_FILE       # optional
                 , label_mapping_filename=LABEL_MAP_FILE     # optional
                 , milestone_mapping_filename=MILESTONE_MAP_FILE # optional
@@ -220,7 +221,7 @@ if __name__=='__main__':
                             , REDMINE_TO_GITHUB_MAP_FILE\
                             , **kwargs)
     #mm.migrate_issues()
-    #mm.migrate_related_tickets()       
+    mm.migrate_related_tickets()       
 
 
         

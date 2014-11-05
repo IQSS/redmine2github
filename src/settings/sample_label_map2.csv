@@ -1,25 +1,25 @@
 redmine_type, redmine_name, github_label_name, github_label_color
-status, New, Status 1: Design, 99cc99
-status, In Review, Status 1: Design, 99cc99
-status, In Design, Status 1: Design, 99cc99
-status, In Dev, Status 2: Dev, 99cc66
-status, In Code Review, Status 3: QA, 99CC00
-status, In QA, Status 3: QA, 99CC00
-priority, Blank, Priority 1: Critical, ff3333
-priority, High, Priority 2: High, ff6666
-priority, Urgent, Priority 2: High, ff6666
-priority, Immediate, Priority 2: High, ff6666
-priority, Low, Priority 3: Medium, ff9999
-priority, Normal, Priority 3: Medium, ff9999
-tracker, Bug, Type 1: Bug, ffcc00
-tracker, Feature, Type 2: Feature, ffcc00
-tracker, Support, Type 2: Feature, ffcc00
-tracker, Documentation, Type 2: Feature, ffcc00
-tracker, Suggestion, Type 3: Suggestion, ffcc00
+status, New, Status: Design, 66ff66
+status, In Review, Status: Design, 66ff66
+status, In Design, Status: Design, 66ff66
+status, In Dev, Status: Dev, 66cc66
+status, In Code Review, Status: QA, 336633
+status, In QA, Status: QA, 336633
+priority, Blank, Priority: Critical, ff9900
+priority, High, Priority: High, e11d21
+priority, Urgent, Priority: High, e11d21
+priority, Immediate, Priority: High, e11d21
+priority, Low, Priority: Medium, cc6666
+priority, Normal, Priority: Medium, cc6666
+tracker, Bug, Type: Bug, fef2c0
+tracker, Feature, Type: Feature, fef2c0
+tracker, Support, Type: Feature, fef2c0
+tracker, Documentation, Type: Feature, fef2c0
+tracker, Suggestion, Type: Suggestion, fef2c0
 Component, API, Component: API, 3399ff
-Component, File Upload & Handling, Component: File Upload & Handling, 3399ff
-Component, high-level, Component: High-level, 3399ff
-Component, Metadata, Component: Metadata, 3399ff
-Component, Migration, Component: Migration, 3399ff
-Component, Search/Browse, Component: Search/Browse, 3399ff
-Component, UX & Component Upgrade, Component: UX & Component Upgrade, 3399ff
+Component, File Upload & Handling, Component: File Upload & Handling, c7def8
+Component, high-level, Component: High-level, c7def8
+Component, Metadata, Component: Metadata, c7def8
+Component, Migration, Component: Migration, c7def8
+Component, Search/Browse, Component: Search/Browse, c7def8
+Component, UX & Component Upgrade, Component: UX & Component Upgrade, c7def8

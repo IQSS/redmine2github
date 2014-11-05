@@ -138,7 +138,7 @@ class RedmineIssueUpdater:
 if __name__=='__main__':
     from settings.base import REDMINE_SERVER, REDMINE_API_KEY, REDMINE_ISSUES_DIRECTORY, REDMINE_TO_GITHUB_MAP_FILE
     
-    issues_dir = os.path.join(REDMINE_ISSUES_DIRECTORY, 'x2014-0709')
+    issues_dir = os.path.join(REDMINE_ISSUES_DIRECTORY, '2014-0902')
     #rn = RedmineIssueDownloader(REDMINE_SERVER, REDMINE_API_KEY, 'dvn', REDMINE_ISSUES_DIRECTORY)
     rn = RedmineIssueUpdater(REDMINE_SERVER, REDMINE_API_KEY, 1, issues_dir, REDMINE_TO_GITHUB_MAP_FILE)
     rn.update_tickets()
