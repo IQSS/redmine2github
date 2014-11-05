@@ -63,5 +63,5 @@ The [add_update_labels.py](https://github.com/IQSS/redmine2github/blob/master/sc
 1.  Run the script against the file:
 
 ```python
->python add_update_labels.py sample_label_input.txt
+$ python add_update_labels.py github_specs.json sample_label_input.txt
 ```
