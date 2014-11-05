@@ -1,4 +1,4 @@
-# Add Colored Labels to GitHub via Script
+# Add Colored Labels to GitHub Issues via API
 
 ## Create a github_specs.json file
 
@@ -14,7 +14,7 @@
 ```
 
 * Template file: (github_specs/template_github_specs.json)
-* ```GITHUB_PERSONAL_API_TOKEN_OR_PASSWORD``` - [Github instructions to create a Personal API Token](https://github.com/blog/1509-personal-api-tokens)
+* ```GITHUB_PERSONAL_API_TOKEN_OR_PASSWORD``` - See [Github instructions to create a Personal API Token](https://github.com/blog/1509-personal-api-tokens)
 
 ## Create a label specs file
 
