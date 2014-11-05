@@ -18,6 +18,9 @@
 
 ## Create a label specs file
 
+Sample label specs file: ["sample_label_input.txt"](https://github.com/IQSS/redmine2github/blob/master/scripts/label_updates/label_specs/sample_label_input.txt) 
+
+
 ### Label Guide / Colors
 
 The Label Name/Color table below shows the label names and colors for:
@@ -27,7 +30,6 @@ The Label Name/Color table below shows the label names and colors for:
 * Type
 * Components - Add specific component names for your file
  
-- Sample file: ["sample_label_input.txt"](https://github.com/IQSS/redmine2github/blob/master/scripts/label_updates/label_specs/sample_label_input.txt) 
 
 ### Label Name/Color table
 
