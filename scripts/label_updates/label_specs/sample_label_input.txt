@@ -1,5 +1,6 @@
-Component: (component name 1)|c7def8|
-Component: (component name 2)|c7def8|
+Component: Content|c7def8
+Component: UI|c7def8
+Component: Deployment|c7def8
 Priority: Critical|ff9900
 Priority: High|e11d21
 Priority: Medium|cc6666
