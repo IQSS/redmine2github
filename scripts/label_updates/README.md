@@ -1,4 +1,24 @@
-## Label Guide / Colors
+# Add Colored Labels to GitHub via Script
+
+## Create a github_specs.json file
+
+* Example file contents
+
+```json
+{
+    "REPO_OWNER_NAME": "IQSS", 
+    "REPO_NAME": "dataverse.org",
+    "GITHUB_AUTH_USERNAME": "my_github_username", 
+    "GITHUB_PERSONAL_API_TOKEN_OR_PASSWORD": "abcd-abcd-abcd-abcd-abcd-abcd-abcd"
+}
+```
+
+* Template file: (github_specs/template_github_specs.json)
+* ```GITHUB_PERSONAL_API_TOKEN_OR_PASSWORD``` - [Github instructions to create a Personal API Token](https://github.com/blog/1509-personal-api-tokens)
+
+## Create a label specs file
+
+### Label Guide / Colors
 
 The Label Name/Color table below shows the label names and colors for:
 
@@ -7,6 +27,7 @@ The Label Name/Color table below shows the label names and colors for:
 * Type
 * Components - Add specific component names for your file
  
+- Sample file: ["sample_label_input.txt"](https://github.com/IQSS/redmine2github/blob/master/scripts/label_updates/label_specs/sample_label_input.txt) 
 
 ### Label Name/Color table
 
@@ -31,12 +52,12 @@ Notes:
 + All Types have the same color
 + All Components have the same color
 
-### Scripting in your labels
+### Run label making scripts
 
 The [add_update_labels.py](https://github.com/IQSS/redmine2github/blob/master/scripts/label_updates/add_update_labels.py) script in this directory may be used to script in your labels via the GitHub API.
 
 1.  Fill in the "MANDATORY VARIABLES" at the top.
-1.  Create a issue map similar to ["sample_label_input.txt"](https://github.com/IQSS/redmine2github/blob/master/scripts/label_updates/sample_label_input.txt)
+1.  Create a issue map similar to 
 1.  Run the script against the file:
 
 ```python

@@ -1,0 +1,6 @@
+{
+    "REPO_OWNER_NAME": "--github-owner-name-- e.g. IQSS", 
+    "REPO_NAME": "--repo-name-- e.g. dataverse.org",
+    "GITHUB_AUTH_USERNAME": "--github-username--", 
+    "GITHUB_PERSONAL_API_TOKEN_OR_PASSWORD": "-- see: https://github.com/blog/1509-personal-api-tokens -- "
+}
