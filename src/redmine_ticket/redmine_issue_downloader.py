@@ -3,7 +3,7 @@ import os
 from os.path import dirname, join, abspath, isdir
 import sys
 import json
-import urllib2
+import requests
 try:
     from urlparse import urljoin
 except:
@@ -79,18 +79,53 @@ class RedmineIssueDownloader:
 
     def get_issue_count(self):
         msgt('get_issue_count')
-        issue_query_str = 'issues.json?project_id=%s&limit=1&status_id=%s' % (self.project_name_or_identifier, self.issue_status)
-        url = urljoin(self.redmine_server, issue_query_str)
-        print (self.redmine_server)
-        msg('Issue count url: %s' % url)
-        content = urllib2.urlopen(url)
-        data = json.load(content)
         
+        issue_query_str = 'issues.json?project_id=%s&limit=1&status_id=%s' \
+                            % (self.project_name_or_identifier, self.issue_status)
+        
+        url = urljoin(self.redmine_server, issue_query_str)
+        
+        msg('Issue count url: %s' % url)
+        
+        # Note: Auth purposely uses the API KEY "as a username with a random password via HTTP Basic authentication"
+        #   from: http://www.redmine.org/projects/redmine/wiki/Rest_api
+        #
+        auth = (self.redmine_api_key, 'random-pw')
+        r = requests.get(url, auth=auth)
+        if not r.status_code == 200:
+            msgt('Error!')
+            msg(r.text)
+            raise Exception("Request for issue count failed! Status code: %s\nUrl: %s\nAuth:%s" % (r.status_code, url, auth))
+        
+        msg('Convert result to JSON')
+        try:
+            data = r.json()     # Let it blow up
+        except:
+            msgt('Error!')
+            msg('Data from request (as text): %s' % r.text)
+            raise Exception('Failed to convert issue count data to JSON.\nUrl: %s\nAuth:%s" % (url, auth)')
+            
         if not data.has_key('total_count'):
             msgx('Total count not found in data: \n[%s]' % data)
 
         return data['total_count']
 
+        """
+import requests
+url = 'https://redmine.hmdc.harvard.edu/issues.json?project_id=dvn&limit=1' #dvn'
+
+# Note: Auth purposely uses the API KEY "as a username with a random password via HTTP Basic authentication"
+#   from: http://www.redmine.org/projects/redmine/wiki/Rest_api
+#
+auth = (self.redmine_api_key, 'random-pw')
+
+r = requests.get(url, auth=auth)
+print r.text
+print r.status_code
+data = r.json()
+print data['total_count']
+
+"""
 
     def write_issue_list(self, issue_fname, issue_dict):
         if issue_fname is None or not type(issue_dict) == dict:
@@ -243,6 +278,7 @@ if __name__=='__main__':
     kwargs = dict(specific_tickets_to_download=[1371, 1399, 1843, 2214, 2215, 2216, 3362, 3387, 3397, 3400, 3232, 3271, 3305, 3426, 3425, 3313, 3208])
     rn = RedmineIssueDownloader(REDMINE_SERVER, REDMINE_API_KEY, 1, REDMINE_ISSUES_DIRECTORY, **kwargs)
     rn.download_tickets2()
+    
     msg(rn.get_issue_count())
     #rn.show_project_info()
     #rn.process_files()
