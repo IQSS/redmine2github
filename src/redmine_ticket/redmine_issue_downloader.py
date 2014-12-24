@@ -111,19 +111,33 @@ class RedmineIssueDownloader:
         return data['total_count']
 
         """
+from __future__ import print_function
 import requests
-url = 'https://redmine.hmdc.harvard.edu/issues.json?project_id=dvn&limit=1' #dvn'
 
-# Note: Auth purposely uses the API KEY "as a username with a random password via HTTP Basic authentication"
-#   from: http://www.redmine.org/projects/redmine/wiki/Rest_api
-#
-auth = (self.redmine_api_key, 'random-pw')
+project_id = 'dvn'
+redmine_api_key = 'some-key'
+url = 'https://redmine.hmdc.harvard.edu/issues.json?project_id=%s&limit=1' % project_id
 
+#---------------------
+# Alternative 1
+#---------------------
+auth = (redmine_api_key, 'random-pw')
 r = requests.get(url, auth=auth)
-print r.text
-print r.status_code
+print (r.text)
+print (r.status_code)
 data = r.json()
-print data['total_count']
+print (data['total_count'])
+
+#---------------------
+# Alternative 2
+#---------------------
+url2 = '%s&key=%s' % (url, redmine_api_key)
+r = requests.get(url2)
+print (r.text)
+print (r.status_code)
+data = r.json()
+print (data['total_count'])
+
 
 """
 
@@ -229,7 +243,7 @@ print data['total_count']
         
         fnames = [x for x in os.listdir(issues_dirname) if x.endswith('.json')]
         for fname in fnames:
-            content = open(join(issues_dirname, fname), 'r').read()
+            content = open(join(issues_dirname, fname), 'rU').read()
             d = json.loads(content)
         
             
@@ -286,7 +300,7 @@ if __name__=='__main__':
     
 """
 import json
-c = open('issue_list2.txt', 'r').read()
+c = open('issue_list2.txt', 'rU').read()
 d = json.loads(c)
 print(len(d))
 """

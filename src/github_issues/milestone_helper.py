@@ -70,7 +70,7 @@ class MilestoneHelper:
             msgx('Error: user name file not found: %s' % self.milestone_mapping_filename)
 
         msgt('Loading milestone map: %s' % self.milestone_mapping_filename)
-        with open(self.milestone_mapping_filename, 'rb') as csvfile:
+        with open(self.milestone_mapping_filename, 'rU') as csvfile:
             map_reader = csv.reader(csvfile, delimiter=',')#, quotechar='|')
             row_num = 0
             for row in map_reader:

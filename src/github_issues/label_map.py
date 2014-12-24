@@ -38,7 +38,7 @@ class LabelMap:
             msgx('Error: user name file not found: %s' % self.label_map_fname)
 
         msgt('Loading label map: %s' % self.label_map_fname)
-        with open(self.label_map_fname, 'rb') as csvfile:
+        with open(self.label_map_fname, 'rU') as csvfile:
             map_reader = csv.reader(csvfile, delimiter=',')#, quotechar='|')
             row_num = 0
             for row in map_reader:

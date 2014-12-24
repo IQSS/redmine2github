@@ -56,7 +56,7 @@ class RedmineIssueUpdater:
         self.project_name_or_identifier = project_name_or_identifier
         self.issue_dirname = issues_dirname
         msg('redmine2github_id_map_filename: %s' % redmine2github_id_map_filename)
-        self.redmine2github_id_map = json.loads(open(redmine2github_id_map_filename, 'r').read())
+        self.redmine2github_id_map = json.loads(open(redmine2github_id_map_filename, 'rU').read())
         
         self.redmine_conn = None
         self.redmine_project = None
@@ -95,7 +95,7 @@ class RedmineIssueUpdater:
             redmine_issue_fname = os.path.join(self.issue_dirname, fname)
             if not os.path.isfile(redmine_issue_fname):
                 msgx('file not found: %s' % redmine_issue_fname)
-            redmine_issue_dict = json.loads(open(redmine_issue_fname, 'r').read())
+            redmine_issue_dict = json.loads(open(redmine_issue_fname, 'rU').read())
 
             github_issue_url = get_gethub_issue_url(github_issue_id)
             

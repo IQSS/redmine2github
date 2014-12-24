@@ -9,7 +9,7 @@ if __name__=='__main__':
     sys.path.append(SRC_ROOT)
 
 from datetime import datetime
-
+import requests
 from jinja2 import Template
 from jinja2 import Environment, PackageLoader
 
@@ -136,10 +136,13 @@ class GithubIssueMaker:
         """
         if not os.path.isfile(redmine_json_fname):
             msgx('ERROR.  update_github_issue_with_related. file not found: %s' % redmine_json_fname)
-        
-        json_str = open(redmine_json_fname, 'r').read()
+
+        #msg('issue map: %s' % redmine2github_issue_map)
+
+        json_str = open(redmine_json_fname, 'rU').read()
         rd = json.loads(json_str)       # The redmine issue as a python dict
-        
+        #msg('rd: %s' % rd)
+
         if rd.get('relations', None) is None:
             msg('no relations')
             return
@@ -305,7 +308,7 @@ class GithubIssueMaker:
         include_comments = kwargs.get('include_comments', True)
         include_assignee = kwargs.get('include_assignee', True)
         
-        json_str = open(redmine_json_fname, 'r').read()
+        json_str = open(redmine_json_fname, 'rU').read()
         rd = json.loads(json_str)       # The redmine issue as a python dict
 
         #msg(json.dumps(rd, indent=4))
@@ -353,6 +356,7 @@ class GithubIssueMaker:
         #
         # (3) Create the issue on github
         #
+
         issue_obj = self.get_github_conn().issues.create(github_issue_dict)
         #issue_obj = self.get_github_conn().issues.update(151, github_issue_dict)
         
@@ -430,15 +434,23 @@ class GithubIssueMaker:
                          , 'author_github_username' : author_github_username\
                          }
             comment_info =  comment_template.render(note_dict)
-            comment_obj = self.get_comments_service().create(issue_num, comment_info)
-            dashes()
-            msg('comment created')
 
-            msg('comment id: %s' % comment_obj.id)
-            msg('api issue_url: %s' % comment_obj.issue_url)
-            msg('api comment url: %s' % comment_obj.url)
-            msg('html_url: %s' % comment_obj.html_url)
-            #msg(dir(comment_obj))
+            comment_obj = None
+            try:
+                comment_obj = self.get_comments_service().create(issue_num, comment_info)
+            except requests.exceptions.HTTPError as e:
+                msgt('Error creating comment: %s' % e.message)
+                continue
+
+            if comment_obj:
+                dashes()
+                msg('comment created')
+
+                msg('comment id: %s' % comment_obj.id)
+                msg('api issue_url: %s' % comment_obj.issue_url)
+                msg('api comment url: %s' % comment_obj.url)
+                msg('html_url: %s' % comment_obj.html_url)
+                #msg(dir(comment_obj))
 
 
 if __name__=='__main__':

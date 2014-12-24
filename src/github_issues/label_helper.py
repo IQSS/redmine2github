@@ -57,7 +57,7 @@ class LabelHelper:
             
             #  (2) Label exists
             if req.status_code == 200:
-                github_label_info = req.json
+                github_label_info = req.json()
                 msg('-- label exists\n %s' % github_label_info)
                 #print label_info
                 

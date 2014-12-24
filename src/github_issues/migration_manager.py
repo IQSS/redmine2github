@@ -108,7 +108,7 @@ class MigrationManager:
         if not os.path.isfile(self.redmine2github_map_file):
             return {}   # {redmine issue # : github issue #}
         
-        fh = open(self.redmine2github_map_file, 'r')
+        fh = open(self.redmine2github_map_file, 'rU')
         content = fh.read()
         fh.close()
         
@@ -207,21 +207,31 @@ class MigrationManager:
                 time.sleep(1)
 
 if __name__=='__main__':
-    json_input_directory = os.path.join(REDMINE_ISSUES_DIRECTORY, '2014-0902')
+    json_input_directory = os.path.join(REDMINE_ISSUES_DIRECTORY, '2014-1224')
 
     kwargs = dict(include_comments=True\
-                , include_assignee=True\
-                , redmine_issue_start_number=0\
-                , redmine_issue_end_number=3500\
-                , user_mapping_filename=USER_MAP_FILE       # optional
+                , redmine_issue_start_number=1\
+                , redmine_issue_end_number=5000\
+                #, user_mapping_filename=USER_MAP_FILE       # optional
+                , include_assignee=False    # Optional. Assignee must be in the github repo and USER_MAP_FILE above
                 , label_mapping_filename=LABEL_MAP_FILE     # optional
-                , milestone_mapping_filename=MILESTONE_MAP_FILE # optional
+                #, milestone_mapping_filename=MILESTONE_MAP_FILE # optional
             )
     mm = MigrationManager(json_input_directory\
                             , REDMINE_TO_GITHUB_MAP_FILE\
                             , **kwargs)
-    #mm.migrate_issues()
-    mm.migrate_related_tickets()       
+
+    #-------------------------------------------------
+    # Run 1 - migrate issues from redmine to github
+    #-------------------------------------------------
+    mm.migrate_issues()
+
+    #-------------------------------------------------
+    # Run 2 - Using the issues maps created in Run 1 (redmine issue num -> new github issue num),
+    #        update github issues to include tickets to related tickets
+    #
+    #-------------------------------------------------
+    #mm.migrate_related_tickets()
 
 
         

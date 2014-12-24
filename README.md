@@ -57,7 +57,7 @@ if __name__=='__main__':
 + run it:
 
 ```
-../redmine2github/src/github_issues> python redmine_issue_downloader.py
+../redmine2github/src/redmine_ticket> python redmine_issue_downloader.py
 ```
 
 
@@ -96,7 +96,11 @@ Note 2: The current [GitHub API limit](https://developer.github.com/v3/rate_limi
 
 ```python
 if __name__=='__main__':
+    # e.g. json_input_directory, where you downloaded the redmine JSON
+    #      json_input_directory="some_dir/working_files/redmine_issues/2014-0709/"
+    #
     json_input_directory = os.path.join(REDMINE_ISSUES_DIRECTORY, '2014-0702')
+
     kwargs = dict(include_comments=True\
                 , include_assignee=False\
                 , redmine_issue_start_number=4123\
@@ -106,9 +110,6 @@ if __name__=='__main__':
                 , milestone_mapping_filename=MILESTONE_MAP_FILE # optional
             )
     mm = MigrationManager(json_input_directory, **kwargs)
-    # e.g. json_input_directory, where you downloaded the redmine JSON
-    #      json_input_directory="some_dir/working_files/redmine_issues/2014-0709/" 
-    #
     mm.migrate_issues()
 ```
 

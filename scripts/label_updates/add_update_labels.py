@@ -42,7 +42,7 @@ class GithubLabelMaker:
         assert isfile(github_specs_fname), "The github_specs file was not found: %s" % github_specs_filename
 
         try:
-            d = json.loads(open(github_specs_fname, 'rb').read())
+            d = json.loads(open(github_specs_fname, 'rU').read())
         except:
             msgx('Could not parse JSON in file: %s' % github_specs_fname)
         
@@ -68,7 +68,7 @@ class GithubLabelMaker:
     def add_labels(self, label_fname):
         assert isfile(label_fname), 'File not found [%s]' % label_fname
           
-        flines = open(label_fname, 'r').readlines()
+        flines = open(label_fname, 'rU').readlines()
     
         # strip lines and skip comments
         #

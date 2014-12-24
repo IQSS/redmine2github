@@ -16,7 +16,7 @@ class UserMapHelper:
         if not os.path.isfile(self.user_map_fname):
             msgx('Error: user name file not found: %s' % self.user_map_fname)
 
-        with open(self.user_map_fname, 'rb') as csvfile:
+        with open(self.user_map_fname, 'rU') as csvfile:
             map_reader = csv.reader(csvfile, delimiter=',')#, quotechar='|')
             row_num = 0
             for row in map_reader:
