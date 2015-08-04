@@ -52,6 +52,7 @@ class MigrationManager:
             
         pat ='^\d{1,10}\.json$'
         fnames = [x for x in os.listdir(self.redmine_json_directory) if re.match(pat, x)]
+        fnames.sort()
         return fnames
 
         
