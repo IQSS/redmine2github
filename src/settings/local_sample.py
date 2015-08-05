@@ -9,10 +9,11 @@ sys.path.append(PROJECT_ROOT)
 #   Redmine API information
 #
 REDMINE_SERVER = 'https://redmine.my-org.edu'
+REDMINE_PROJECT_ID = 'PROJ_ID' # Found in project url: http://redmine.my-org.edu/projects/PROJ_ID
 
 # See http://www.redmine.org/projects/redmine/wiki/Rest_api#Authentication
 # "You can find your API key on your account page..."
-REDMINE_API_KEY = 'my-api-key from remdine account page'    
+REDMINE_API_KEY = 'my-api-key from remdine account page'
 
 GITHUB_SERVER = 'https://api.github.com'
 GITHUB_LOGIN = 'github username'
@@ -27,7 +28,7 @@ REDMINE_ISSUES_DIRECTORY = join(WORKING_FILES_DIRECTORY, 'redmine_issues')
 # JSON file mapping { redmine issue # : github issue # }
 REDMINE_TO_GITHUB_MAP_FILE = join(WORKING_FILES_DIRECTORY, 'redmine2github_issue_map.json')
 
-# (optional) csv file mapping Redmine users to github users.  
+# (optional) csv file mapping Redmine users to github users.
 # Manually created.  Doesn't check for name collisions
 # example, see settings/sample_user_map.csv
 USER_MAP_FILE = join(WORKING_FILES_DIRECTORY, 'redmine2github_user_map.csv')
